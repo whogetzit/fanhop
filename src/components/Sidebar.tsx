@@ -1,40 +1,46 @@
 'use client'
 
-import { useEffect, useRef, useState } from 'react'
-import type { StatWeights, SavedModel } from '@/types/bracket'
-import { STAT_GROUPS, STAT_LABELS, DEFAULT_WEIGHTS, PRESETS } from '@/types/bracket'
+import { useEffect, useRef, useState, useCallback } from 'react'
+import type { StatWeights } from '@/types/bracket'
+import { STAT_GROUPS, STAT_LABELS, PRESETS } from '@/types/bracket'
 import { simTournament } from '@/lib/simulation'
+import { saveModelToCloud, loadModelsFromCloud, deleteModelFromCloud } from '@/lib/supabase'
+import type { User } from '@supabase/supabase-js'
 
-const LS_KEY = 'fanhop_models'
-
-function loadModels(): SavedModel[] {
-  try { return JSON.parse(localStorage.getItem(LS_KEY) ?? '[]') } catch { return [] }
-}
-function saveModels(m: SavedModel[]) {
-  localStorage.setItem(LS_KEY, JSON.stringify(m))
+interface CloudModel {
+  id: string
+  name: string
+  champion: string | null
+  weights: Record<string, number>
+  is_public: boolean
+  updated_at: string
 }
 
 interface Props {
   weights: StatWeights
   modelName: string
+  user: User | null
   onWeightsChange: (w: StatWeights) => void
   onNameChange: (name: string) => void
+  onNeedAuth: () => void
+  onToast: (msg: string) => void
 }
 
-export default function Sidebar({ weights, modelName, onWeightsChange, onNameChange }: Props) {
-  const [saved, setSaved] = useState<SavedModel[]>([])
+export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast }: Props) {
+  const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [toast, setToast] = useState<string | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>('balanced')
-  const toastTimer = useRef<ReturnType<typeof setTimeout>>()
+  const [saving, setSaving] = useState(false)
 
-  useEffect(() => { setSaved(loadModels()) }, [])
-
-  function showToast(msg: string) {
-    clearTimeout(toastTimer.current)
-    setToast(msg)
-    toastTimer.current = setTimeout(() => setToast(null), 2000)
-  }
+  // Load models from cloud when user signs in
+  useEffect(() => {
+    if (user) {
+      loadModelsFromCloud().then(models => setSaved(models as CloudModel[]))
+    } else {
+      setSaved([])
+      setActiveId(null)
+    }
+  }, [user])
 
   function handleSlider(stat: keyof StatWeights, val: number) {
     onWeightsChange({ ...weights, [stat]: val })
@@ -47,44 +53,46 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
     setActiveId(null)
   }
 
-  function handleSave() {
+  async function handleSave() {
+    if (!user) { onNeedAuth(); return }
     const name = modelName.trim()
-    if (!name) return
-    const result = simTournament(weights)
-    const models = loadModels()
-    const existIdx = models.findIndex(m => m.name.toLowerCase() === name.toLowerCase())
-    const model: SavedModel = {
-      id: existIdx >= 0 ? models[existIdx].id : Date.now().toString(),
-      name,
-      weights: { ...weights },
-      champion: result.champion,
-      savedAt: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+    if (!name) { onToast('Name your model first'); return }
+
+    setSaving(true)
+    try {
+      const result = simTournament(weights)
+      await saveModelToCloud(name, weights as Record<string, number>, result.champion)
+      const models = await loadModelsFromCloud()
+      setSaved(models as CloudModel[])
+      const saved = models.find((m: any) => m.name === name)
+      if (saved) setActiveId(saved.id)
+      onToast(`"${name}" saved`)
+    } catch (e: any) {
+      onToast('Save failed: ' + e.message)
+    } finally {
+      setSaving(false)
     }
-    if (existIdx >= 0) { models[existIdx] = model; showToast(`"${name}" updated`) }
-    else { models.unshift(model); showToast(`"${name}" saved`) }
-    saveModels(models)
-    setSaved(loadModels())
-    setActiveId(model.id)
   }
 
-  function handleLoad(id: string) {
-    const model = saved.find(m => m.id === id)
-    if (!model) return
-    onWeightsChange(model.weights)
+  function handleLoad(model: CloudModel) {
+    onWeightsChange(model.weights as StatWeights)
     onNameChange(model.name)
-    setActiveId(id)
+    setActiveId(model.id)
     setActivePreset(null)
-    showToast(`Loaded "${model.name}"`)
+    onToast(`Loaded "${model.name}"`)
   }
 
-  function handleDelete(id: string, e: React.MouseEvent) {
+  async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
     const model = saved.find(m => m.id === id)
-    const next = saved.filter(m => m.id !== id)
-    saveModels(next)
-    setSaved(next)
-    if (activeId === id) setActiveId(null)
-    if (model) showToast(`"${model.name}" deleted`)
+    try {
+      await deleteModelFromCloud(id)
+      setSaved(prev => prev.filter(m => m.id !== id))
+      if (activeId === id) setActiveId(null)
+      if (model) onToast(`"${model.name}" deleted`)
+    } catch {
+      onToast('Delete failed')
+    }
   }
 
   const totalWeight = Object.values(weights).reduce((a, b) => a + b, 0)
@@ -121,10 +129,7 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
       </div>
 
       {/* Sliders */}
-      <div
-        className="flex-1 overflow-y-auto px-4 py-2"
-        style={{ scrollbarWidth: 'thin', scrollbarColor: 'var(--dim) transparent' }}
-      >
+      <div className="flex-1 overflow-y-auto px-4 py-2" style={{ scrollbarWidth: 'thin' }}>
         {STAT_GROUPS.map(group => (
           <div key={group.label} className="mb-3">
             <div
@@ -135,23 +140,18 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
             </div>
             {group.stats.map(stat => (
               <div key={stat} className="flex items-center gap-2 mb-[7px]">
-                <span
-                  className="text-[11px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 108, color: 'var(--ftext)' }}
-                >
+                <span className="text-[11px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ width: 108, color: 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
-                  type="range"
-                  min={0} max={10} step={1}
+                  type="range" min={0} max={10} step={1}
                   value={weights[stat]}
                   onChange={e => handleSlider(stat, Number(e.target.value))}
                   className="flex-1"
                 />
-                <span
-                  className="font-barlowc font-bold text-[13px] text-right flex-shrink-0"
-                  style={{ width: 18, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}
-                >
+                <span className="font-barlowc font-bold text-[13px] text-right flex-shrink-0"
+                  style={{ width: 18, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
@@ -161,16 +161,9 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
       </div>
 
       {/* Total weight */}
-      <div
-        className="flex-shrink-0 flex justify-between items-center px-4 py-2 border-t"
-        style={{ borderColor: 'var(--rule)' }}
-      >
-        <span className="font-barlowc text-[10px] uppercase tracking-[1px]" style={{ color: 'var(--muted)' }}>
-          Total Weight
-        </span>
-        <span className="font-barlowc font-bold text-2xl leading-none" style={{ color: 'var(--orange)' }}>
-          {totalWeight}
-        </span>
+      <div className="flex-shrink-0 flex justify-between items-center px-4 py-2 border-t" style={{ borderColor: 'var(--rule)' }}>
+        <span className="font-barlowc text-[10px] uppercase tracking-[1px]" style={{ color: 'var(--muted)' }}>Total Weight</span>
+        <span className="font-barlowc font-bold text-2xl leading-none" style={{ color: 'var(--orange)' }}>{totalWeight}</span>
       </div>
 
       {/* Save panel */}
@@ -184,30 +177,34 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
             placeholder="Name your model…"
             maxLength={32}
             className="flex-1 min-w-0 rounded px-2 py-[6px] text-[12px] border outline-none transition-colors"
-            style={{
-              background: 'var(--navy3)',
-              borderColor: 'var(--dim)',
-              color: 'var(--ftext)',
-            }}
+            style={{ background: 'var(--navy3)', borderColor: 'var(--dim)', color: 'var(--ftext)' }}
             onFocus={e => (e.target.style.borderColor = 'var(--orange)')}
             onBlur={e => (e.target.style.borderColor = 'var(--dim)')}
           />
           <button
             onClick={handleSave}
+            disabled={saving}
             className="flex-shrink-0 px-3 py-[6px] rounded font-barlowc font-bold text-[12px] uppercase tracking-[1px] text-white transition-colors"
-            style={{ background: 'var(--orange)' }}
+            style={{ background: 'var(--orange)', opacity: saving ? 0.6 : 1 }}
             onMouseEnter={e => (e.currentTarget.style.background = 'var(--orange2)')}
             onMouseLeave={e => (e.currentTarget.style.background = 'var(--orange)')}
           >
-            Save
+            {saving ? '…' : user ? 'Save' : 'Save ↑'}
           </button>
         </div>
 
+        {!user && (
+          <div className="px-4 pb-2 text-[11px]" style={{ color: 'var(--dim)' }}>
+            <button onClick={onNeedAuth} className="underline" style={{ color: 'var(--muted)' }}>Sign in</button>
+            {' '}to save to the cloud
+          </div>
+        )}
+
         {/* Saved list */}
         {saved.length === 0 ? (
-          <p className="px-4 pb-3 text-[11px] italic" style={{ color: 'var(--dim)' }}>
-            No saved models yet
-          </p>
+          user ? (
+            <p className="px-4 pb-3 text-[11px] italic" style={{ color: 'var(--dim)' }}>No saved models yet</p>
+          ) : null
         ) : (
           <div className="max-h-[152px] overflow-y-auto" style={{ scrollbarWidth: 'thin' }}>
             <div className="px-4 pb-1 font-barlowc font-semibold text-[9px] uppercase tracking-[2px]" style={{ color: 'var(--muted)' }}>
@@ -216,7 +213,7 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
             {saved.map(m => (
               <button
                 key={m.id}
-                onClick={() => handleLoad(m.id)}
+                onClick={() => handleLoad(m)}
                 className="w-full flex items-center px-4 h-[34px] border-t text-left transition-colors relative"
                 style={{
                   borderColor: 'var(--rule)',
@@ -226,15 +223,10 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
                 onMouseLeave={e => { if (m.id !== activeId) e.currentTarget.style.background = 'transparent' }}
               >
                 {m.id === activeId && (
-                  <span
-                    className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r"
-                    style={{ background: 'var(--orange)' }}
-                  />
+                  <span className="absolute left-0 top-0 bottom-0 w-[3px] rounded-r" style={{ background: 'var(--orange)' }} />
                 )}
-                <span
-                  className="flex-1 text-[12px] font-medium truncate"
-                  style={{ color: m.id === activeId ? 'var(--orange2)' : 'var(--ftext)' }}
-                >
+                <span className="flex-1 text-[12px] font-medium truncate"
+                  style={{ color: m.id === activeId ? 'var(--orange2)' : 'var(--ftext)' }}>
                   {m.name}
                 </span>
                 <span className="text-[10px] truncate max-w-[78px] mr-2" style={{ color: 'var(--muted)' }}>
@@ -246,25 +238,12 @@ export default function Sidebar({ weights, modelName, onWeightsChange, onNameCha
                   style={{ color: 'var(--dim)' }}
                   onMouseEnter={e => { e.currentTarget.style.color = '#ff5566' }}
                   onMouseLeave={e => { e.currentTarget.style.color = 'var(--dim)' }}
-                  title="Delete"
-                >
-                  ×
-                </span>
+                >×</span>
               </button>
             ))}
           </div>
         )}
       </div>
-
-      {/* Toast */}
-      {toast && (
-        <div
-          className="fixed bottom-5 left-[130px] -translate-x-1/2 px-4 py-2 rounded-full font-barlowc font-semibold text-[12px] border z-50 pointer-events-none"
-          style={{ background: 'var(--navy2)', borderColor: 'var(--orange)', color: 'var(--orange2)' }}
-        >
-          {toast}
-        </div>
-      )}
     </aside>
   )
 }

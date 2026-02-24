@@ -1,13 +1,14 @@
 'use client'
 
-import { useState, useCallback, useRef } from 'react'
+import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { simTournament, getSeed } from '@/lib/simulation'
 import { buildShareUrl, encodeModel } from '@/lib/encoding'
+import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
 import BracketCanvas from './BracketCanvas'
-import { BRACKET } from '@/lib/data/2013'
-import type { RegionName } from '@/types/bracket'
+import AuthModal from './AuthModal'
+import type { User } from '@supabase/supabase-js'
 
 interface Props {
   initialWeights: StatWeights
@@ -19,34 +20,52 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
   const [modelName, setModelName] = useState(initialName ?? '')
   const [result, setResult] = useState<TournamentResult>(() => simTournament(initialWeights))
   const [shareToast, setShareToast] = useState<string | null>(null)
+  const [showAuth, setShowAuth] = useState(false)
+  const [user, setUser] = useState<User | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  // Watch auth state
+  useEffect(() => {
+    const supabase = createClient()
+    supabase.auth.getUser().then(({ data }) => setUser(data.user))
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
+      setUser(session?.user ?? null)
+    })
+    return () => subscription.unsubscribe()
+  }, [])
 
   const handleWeightsChange = useCallback((next: StatWeights) => {
     setWeights(next)
     setResult(simTournament(next))
   }, [])
 
+  const showToast = useCallback((msg: string) => {
+    clearTimeout(toastTimer.current)
+    setShareToast(msg)
+    toastTimer.current = setTimeout(() => setShareToast(null), 2500)
+  }, [])
+
   const handleShare = useCallback(() => {
     const url = buildShareUrl({ weights, name: modelName || undefined })
-    navigator.clipboard.writeText(url).then(() => {
-      clearTimeout(toastTimer.current)
-      setShareToast('Link copied!')
-      toastTimer.current = setTimeout(() => setShareToast(null), 2500)
-    }).catch(() => {
-      // Fallback for non-https
+    navigator.clipboard.writeText(url).catch(() => {
       const el = document.createElement('input')
       el.value = url
       document.body.appendChild(el)
       el.select()
       document.execCommand('copy')
       document.body.removeChild(el)
-      setShareToast('Link copied!')
-      toastTimer.current = setTimeout(() => setShareToast(null), 2500)
     })
-    // Update URL bar without reload
+    showToast('Link copied!')
     const encoded = encodeModel({ weights, name: modelName || undefined })
     window.history.replaceState(null, '', `/bracket?m=${encoded}`)
-  }, [weights, modelName])
+  }, [weights, modelName, showToast])
+
+  const handleSignOut = useCallback(async () => {
+    await signOut()
+    showToast('Signed out')
+  }, [showToast])
+
+  const avatarLetter = user?.email?.[0]?.toUpperCase() ?? user?.user_metadata?.name?.[0]?.toUpperCase()
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
@@ -55,10 +74,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
         className="flex-shrink-0 flex items-center gap-5 px-5 h-[50px] border-b-2"
         style={{ background: 'var(--navy2)', borderColor: 'var(--orange)' }}
       >
-        <div
-          className="font-barlowc font-bold text-2xl tracking-[3px]"
-          style={{ color: 'var(--ftext)' }}
-        >
+        <div className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
           Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
         </div>
 
@@ -84,7 +100,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
             </div>
           </div>
 
-          {/* Share button */}
+          {/* Share */}
           <button
             onClick={handleShare}
             className="px-4 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] text-white transition-colors"
@@ -94,6 +110,39 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
           >
             Share ↗
           </button>
+
+          {/* Auth */}
+          {user ? (
+            <div className="flex items-center gap-2">
+              <a
+                href={`/u/${user.id}`}
+                className="w-8 h-8 rounded-full flex items-center justify-center font-barlowc font-bold text-[13px] text-white"
+                style={{ background: 'var(--orange)' }}
+                title={user.email ?? 'Profile'}
+              >
+                {avatarLetter}
+              </a>
+              <button
+                onClick={handleSignOut}
+                className="text-[11px] uppercase tracking-[1px]"
+                style={{ color: 'var(--dim)' }}
+                onMouseEnter={e => (e.currentTarget.style.color = 'var(--muted)')}
+                onMouseLeave={e => (e.currentTarget.style.color = 'var(--dim)')}
+              >
+                Sign out
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={() => setShowAuth(true)}
+              className="px-4 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors"
+              style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
+              onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+              onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
+            >
+              Sign In
+            </button>
+          )}
         </div>
       </header>
 
@@ -102,28 +151,29 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
         <Sidebar
           weights={weights}
           modelName={modelName}
+          user={user}
           onWeightsChange={handleWeightsChange}
           onNameChange={setModelName}
+          onNeedAuth={() => setShowAuth(true)}
+          onToast={showToast}
         />
-
         <div className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin' }}>
           <BracketCanvas result={result} />
         </div>
       </div>
 
-      {/* Share toast */}
+      {/* Toast */}
       {shareToast && (
         <div
           className="fixed bottom-5 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full font-barlowc font-semibold text-[13px] tracking-[0.5px] border z-50 pointer-events-none"
-          style={{
-            background: 'var(--navy2)',
-            borderColor: 'var(--orange)',
-            color: 'var(--orange2)',
-          }}
+          style={{ background: 'var(--navy2)', borderColor: 'var(--orange)', color: 'var(--orange2)' }}
         >
           {shareToast}
         </div>
       )}
+
+      {/* Auth modal */}
+      {showAuth && <AuthModal onClose={() => setShowAuth(false)} />}
     </div>
   )
 }

@@ -1,8 +1,7 @@
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
-// ─── Browser client (use in Client Components) ────────────────────────────────
-// Call this inside components/hooks, not at module level
+const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
 
 export function createClient() {
   return createBrowserClient<Database>(
@@ -11,25 +10,79 @@ export function createClient() {
   )
 }
 
-// ─── Auth helpers ─────────────────────────────────────────────────────────────
-
-export async function signInWithGitHub() {
-  const supabase = createClient()
-  return supabase.auth.signInWithOAuth({
-    provider: 'github',
-    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
-  })
-}
-
 export async function signInWithGoogle() {
   const supabase = createClient()
   return supabase.auth.signInWithOAuth({
     provider: 'google',
-    options: { redirectTo: `${process.env.NEXT_PUBLIC_APP_URL}/auth/callback` },
+    options: { redirectTo: `${APP_URL}/auth/callback` },
+  })
+}
+
+export async function signInWithMagicLink(email: string) {
+  const supabase = createClient()
+  return supabase.auth.signInWithOtp({
+    email,
+    options: { emailRedirectTo: `${APP_URL}/auth/callback` },
   })
 }
 
 export async function signOut() {
   const supabase = createClient()
   return supabase.auth.signOut()
+}
+
+export async function saveModelToCloud(
+  name: string,
+  weights: Record<string, number>,
+  champion: string,
+  isPublic = false
+) {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) throw new Error('Not signed in')
+
+  const { data, error } = await supabase
+    .from('models')
+    .upsert(
+      { user_id: user.id, name, weights, champion, is_public: isPublic, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,name' }
+    )
+    .select()
+    .single()
+
+  if (error) throw error
+  return data
+}
+
+export async function loadModelsFromCloud() {
+  const supabase = createClient()
+  const { data: { user } } = await supabase.auth.getUser()
+  if (!user) return []
+
+  const { data, error } = await supabase
+    .from('models')
+    .select('*')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false })
+
+  if (error) throw error
+  return data ?? []
+}
+
+export async function deleteModelFromCloud(id: string) {
+  const supabase = createClient()
+  const { error } = await supabase.from('models').delete().eq('id', id)
+  if (error) throw error
+}
+
+export async function getPublicModels(userId: string) {
+  const supabase = createClient()
+  const { data, error } = await supabase
+    .from('models')
+    .select('*')
+    .eq('user_id', userId)
+    .eq('is_public', true)
+    .order('updated_at', { ascending: false })
+  if (error) throw error
+  return data ?? []
 }
