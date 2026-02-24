@@ -190,6 +190,6 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
 function encodeModel(model: Model): string {
   // Simple version — just encode weights
   const { buildShareUrl } = require('@/lib/encoding')
-  const url = buildShareUrl({ weights: model.weights as StatWeights, name: model.name }, '')
+  const url = buildShareUrl({ weights: model.weights as unknown as StatWeights, name: model.name }, '')
   return url.replace('/bracket?m=', '')
 }
