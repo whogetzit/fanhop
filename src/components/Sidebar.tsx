@@ -141,7 +141,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
             {group.stats.map(stat => (
               <div key={stat} className="flex items-center gap-1 mb-[2px]">
                 <span className="text-[10px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 100, color: 'var(--ftext)' }}>
+                  style={{ width: 85, color: 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
