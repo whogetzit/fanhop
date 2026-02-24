@@ -7,9 +7,12 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
   const body = await req.json()
+  const update: Record<string, unknown> = { updated_at: new Date().toISOString() }
+  if (body.is_public !== undefined) update.is_public = body.is_public
+
   const { data, error } = await supabase
     .from('models')
-    .update({ is_public: body.is_public, updated_at: new Date().toISOString() })
+    .update(update as never)
     .eq('id', params.id)
     .eq('user_id', user.id)
     .select()
