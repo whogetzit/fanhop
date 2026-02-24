@@ -49,10 +49,11 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }
 
   function applyPreset(key: string) {
-    onWeightsChange(PRESETS[key])
-    setActivePreset(key)
-    setActiveId(null)
-  }
+  onWeightsChange(PRESETS[key])
+  setActivePreset(key)
+  setActiveId(null)
+  onNameChange(key.charAt(0).toUpperCase() + key.slice(1))
+}
 
   async function handleSave() {
     if (!user) { onNeedAuth(); return }
