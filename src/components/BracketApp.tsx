@@ -23,6 +23,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
   const [showAuth, setShowAuth] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
+  const [activePreset, setActivePreset] = useState<string | null>('balanced')
 
   // Watch auth state
   useEffect(() => {
@@ -168,7 +169,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
           onNeedAuth={() => setShowAuth(true)}
           onToast={showToast}
         />
-        <div id="print-area" className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin', ['--model-name' as any]: `"${modelName || 'Untitled Bracket'}"` }}>
+        <div id="print-area" className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin', ['--model-name' as any]: `"${activePreset ? activePreset.charAt(0).toUpperCase() + activePreset.slice(1) : modelName || 'My Bracket'}"` }}>
           <BracketCanvas result={result} />
         </div>
       </div>
