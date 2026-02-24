@@ -101,7 +101,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   return (
     <aside
       className="flex flex-col flex-shrink-0 overflow-hidden border-r"
-      style={{ width: 220, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
+      style={{ width: 240, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
     >
       {/* Title */}
       <div className="flex-shrink-0 px-3 pt-2 pb-1 border-b" style={{ borderColor: 'var(--rule)' }}>
