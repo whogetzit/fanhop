@@ -80,12 +80,13 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }
 
   function handleLoad(model: CloudModel) {
-    onWeightsChange(model.weights as StatWeights)
-    onNameChange(model.name)
-    setActiveId(model.id)
-    setActivePreset(null)
-    onToast(`Loaded "${model.name}"`)
-  }
+  onWeightsChange(model.weights as StatWeights)
+  onNameChange(model.name)
+  setActiveId(model.id)
+  setActivePreset(null)
+  onPresetChange(null)
+  onToast(`Loaded "${model.name}"`)
+}
 
   async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
