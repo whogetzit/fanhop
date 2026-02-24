@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useState, useCallback, useRef, useEffect } from 'react'
@@ -100,6 +99,17 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
               </div>
             </div>
           </div>
+
+          {/* Print */}
+          <button
+            onClick={() => window.print()}
+            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
+          >
+            🖨 Print
+          </button>
 
           {/* Share */}
           <button

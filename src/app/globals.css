@@ -59,3 +59,11 @@ input[type='range']::-webkit-slider-thumb:hover {
   0%, 100% { box-shadow: 0 0 8px rgba(249, 106, 27, 0.3); }
   50%       { box-shadow: 0 0 20px rgba(249, 106, 27, 0.7); }
 }
+
+/* Print styles */
+@media print {
+  body { background: white !important; color: black !important; }
+  header, aside { display: none !important; }
+  .flex-1 { overflow: visible !important; }
+  * { color-adjust: exact; -webkit-print-color-adjust: exact; }
+}

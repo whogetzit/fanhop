@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -104,15 +103,14 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
       style={{ width: 260, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
     >
       {/* Title */}
-      <div className="flex-shrink-0 px-4 pt-3 pb-2 border-b" style={{ borderColor: 'var(--rule)' }}>
-        <div className="font-barlowc font-bold text-lg tracking-[2px] leading-none mb-1" style={{ color: 'var(--orange)' }}>
+      <div className="flex-shrink-0 px-3 pt-2 pb-1 border-b" style={{ borderColor: 'var(--rule)' }}>
+        <div className="font-barlowc font-bold text-base tracking-[2px] leading-none" style={{ color: 'var(--orange)' }}>
           Your Model
         </div>
-        <div className="text-[11px]" style={{ color: 'var(--muted)' }}>Weight each stat. Bracket auto-fills.</div>
       </div>
 
       {/* Presets */}
-      <div className="flex-shrink-0 flex gap-1 flex-wrap px-4 py-2 border-b" style={{ borderColor: 'var(--rule)' }}>
+      <div className="flex-shrink-0 flex gap-1 flex-wrap px-3 py-1 border-b" style={{ borderColor: 'var(--rule)' }}>
         {Object.keys(PRESETS).map(key => (
           <button
             key={key}
@@ -129,20 +127,20 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
         ))}
       </div>
 
-      {/* Sliders */}
-      <div className="flex-1 overflow-y-auto px-4 py-2" style={{ scrollbarWidth: 'thin' }}>
+      {/* Sliders — no scroll, compressed to fit */}
+      <div className="flex-1 px-3 py-1 overflow-hidden">
         {STAT_GROUPS.map(group => (
-          <div key={group.label} className="mb-3">
+          <div key={group.label} className="mb-1">
             <div
-              className="font-barlowc font-semibold text-[9px] uppercase tracking-[2.5px] mb-2 pb-1 border-b"
+              className="font-barlowc font-semibold text-[8px] uppercase tracking-[2px] mb-[2px] pb-[1px] border-b"
               style={{ color: 'var(--orange)', borderColor: 'var(--rule)' }}
             >
               {group.label}
             </div>
             {group.stats.map(stat => (
-              <div key={stat} className="flex items-center gap-2 mb-[7px]">
-                <span className="text-[11px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 108, color: 'var(--ftext)' }}>
+              <div key={stat} className="flex items-center gap-1 mb-[2px]">
+                <span className="text-[10px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
+                  style={{ width: 100, color: 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
@@ -150,9 +148,10 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
                   value={weights[stat]}
                   onChange={e => handleSlider(stat, Number(e.target.value))}
                   className="flex-1"
+                  style={{ height: 14 }}
                 />
-                <span className="font-barlowc font-bold text-[13px] text-right flex-shrink-0"
-                  style={{ width: 18, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
+                <span className="font-barlowc font-bold text-[11px] text-right flex-shrink-0"
+                  style={{ width: 14, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
@@ -162,14 +161,14 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
       </div>
 
       {/* Total weight */}
-      <div className="flex-shrink-0 flex justify-between items-center px-4 py-2 border-t" style={{ borderColor: 'var(--rule)' }}>
-        <span className="font-barlowc text-[10px] uppercase tracking-[1px]" style={{ color: 'var(--muted)' }}>Total Weight</span>
-        <span className="font-barlowc font-bold text-2xl leading-none" style={{ color: 'var(--orange)' }}>{totalWeight}</span>
+      <div className="flex-shrink-0 flex justify-between items-center px-3 py-1 border-t" style={{ borderColor: 'var(--rule)' }}>
+        <span className="font-barlowc text-[9px] uppercase tracking-[1px]" style={{ color: 'var(--muted)' }}>Total Weight</span>
+        <span className="font-barlowc font-bold text-xl leading-none" style={{ color: 'var(--orange)' }}>{totalWeight}</span>
       </div>
 
       {/* Save panel */}
       <div className="flex-shrink-0 border-t" style={{ background: 'var(--navy)', borderColor: 'var(--rule)' }}>
-        <div className="flex gap-2 px-4 py-2">
+        <div className="flex gap-2 px-3 py-1">
           <input
             type="text"
             value={modelName}
