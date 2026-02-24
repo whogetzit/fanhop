@@ -38,7 +38,7 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
   }
 
   function handleShare(model: Model) {
-    const url = buildShareUrl({ weights: model.weights as StatWeights, name: model.name })
+    const url = buildShareUrl({ weights: model.weights as unknown as StatWeights, name: model.name })
     navigator.clipboard.writeText(url).then(() => showToast('Link copied!'))
   }
 
