@@ -168,7 +168,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
           onNeedAuth={() => setShowAuth(true)}
           onToast={showToast}
         />
-        <div className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin' }}>
+        <div id="print-area" className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin', ['--model-name' as any]: `"${modelName || 'My Bracket'}"` }}>
           <BracketCanvas result={result} />
         </div>
       </div>
