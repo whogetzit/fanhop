@@ -1,4 +1,3 @@
-// @ts-nocheck
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
@@ -26,10 +25,10 @@ interface Props {
   onNeedAuth: () => void
   onToast: (msg: string) => void
   onPresetChange: (preset: string | null) => void
-  onPresetChange: (preset: string | null) => void
+  mobile?: boolean
 }
 
-export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange }: Props) {
+export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, mobile }: Props) {
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>('balanced')
@@ -45,18 +44,16 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
     }
   }, [user])
 
- function handleSlider(stat: keyof StatWeights, val: number) {
-  onWeightsChange({ ...weights, [stat]: val })
-  setActivePreset(null)
-  onPresetChange={setActivePreset}
-}
+  function handleSlider(stat: keyof StatWeights, val: number) {
+    onWeightsChange({ ...weights, [stat]: val })
+    setActivePreset(null)
+  }
 
   function applyPreset(key: string) {
-  onWeightsChange(PRESETS[key])
-  setActivePreset(key)
-  setActiveId(null)
-  onPresetChange(key)
-}
+    onWeightsChange(PRESETS[key])
+    setActivePreset(key)
+    setActiveId(null)
+  }
 
   async function handleSave() {
     if (!user) { onNeedAuth(); return }
@@ -80,13 +77,12 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }
 
   function handleLoad(model: CloudModel) {
-  onWeightsChange(model.weights as StatWeights)
-  onNameChange(model.name)
-  setActiveId(model.id)
-  setActivePreset(null)
-  onPresetChange(null)
-  onToast(`Loaded "${model.name}"`)
-}
+    onWeightsChange(model.weights as StatWeights)
+    onNameChange(model.name)
+    setActiveId(model.id)
+    setActivePreset(null)
+    onToast(`Loaded "${model.name}"`)
+  }
 
   async function handleDelete(id: string, e: React.MouseEvent) {
     e.stopPropagation()
@@ -105,8 +101,8 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 border-r"
-      style={{ width: 260, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
+      className="flex flex-col flex-shrink-0 overflow-hidden border-r"
+      style={{ width: mobile ? '100%' : 260, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
     >
       {/* Title */}
       <div className="flex-shrink-0 px-3 pt-2 pb-1 border-b" style={{ borderColor: 'var(--rule)' }}>
@@ -146,7 +142,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
             {group.stats.map(stat => (
               <div key={stat} className="flex items-center gap-1 mb-[2px]">
                 <span className="text-[10px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 85, color: 'var(--ftext)' }}>
+                  style={{ width: 100, color: 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
@@ -157,7 +153,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
                   style={{ height: 14 }}
                 />
                 <span className="font-barlowc font-bold text-[11px] text-right flex-shrink-0"
-                  style={{ width: 20, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
+                  style={{ width: 14, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
