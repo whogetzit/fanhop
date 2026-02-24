@@ -102,12 +102,22 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
 
           {/* Print */}
           <button
-            onClick={() => window.print()}
-            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
-            style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
-          >
+            onClick={() => {
+  const el = document.querySelector('.overflow-auto') as HTMLElement
+  if (el) {
+    const scaleX = (window.innerWidth * 0.96) / el.scrollWidth
+    const scaleY = (window.innerHeight * 0.96) / el.scrollHeight
+    const scale = Math.min(scaleX, scaleY)
+    el.style.transform = `scale(${scale})`
+    el.style.transformOrigin = 'top left'
+    el.style.width = `${100 / scale}%`
+  }
+  setTimeout(() => {
+    window.print()
+    const el2 = document.querySelector('.overflow-auto') as HTMLElement
+    if (el2) { el2.style.transform = ''; el2.style.width = '' }
+  }, 100)
+}}
             🖨 Print
           </button>
 
