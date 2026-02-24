@@ -62,8 +62,10 @@ input[type='range']::-webkit-slider-thumb:hover {
 
 /* Print styles */
 @media print {
-  body { background: white !important; color: black !important; }
+  body { background: white !important; color: black !important; margin: 0; }
   header, aside { display: none !important; }
   .flex-1 { overflow: visible !important; }
   * { color-adjust: exact; -webkit-print-color-adjust: exact; }
+  @page { size: landscape; margin: 0.3in; }
+  #bracket-canvas { transform-origin: top left; transform: scale(0.72); }
 }
