@@ -26,6 +26,7 @@ interface Props {
   onNeedAuth: () => void
   onToast: (msg: string) => void
   onPresetChange: (preset: string | null) => void
+  onPresetChange: (preset: string | null) => void
 }
 
 export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange }: Props) {
