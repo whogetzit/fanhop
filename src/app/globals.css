@@ -62,37 +62,34 @@ input[type='range']::-webkit-slider-thumb:hover {
 
 /* Print styles */
 @media print {
-  @page { size: landscape; margin: 0.2in; }
-  
+  @page { size: landscape; margin: 0.15in; }
+
   body { background: white !important; margin: 0; }
-  
-  /* Hide everything except bracket */
+
   header, aside, .fixed { display: none !important; }
-  
-  /* Make bracket fill the page */
-  html, body, #__next, .flex, .flex-col, .flex-1 {
-    height: auto !important;
+
+  html, body, #__next { height: auto !important; overflow: visible !important; }
+
+  .flex-col { height: auto !important; }
+
+  .overflow-auto {
     overflow: visible !important;
+    transform: scale(0.58);
+    transform-origin: top left;
+    width: 172% !important;
+    height: auto !important;
   }
 
-  /* Watermark */
-  .flex-1::before {
+  .overflow-auto::before {
     content: 'fanhop.com';
     display: block;
     font-family: sans-serif;
     font-size: 11px;
     font-weight: bold;
     color: #f96a1b;
-    letter-spacing: 2px;
+    letter-spacing: 3px;
     text-transform: uppercase;
-    margin-bottom: 6px;
-  }
-
-  /* Scale bracket to fit */
-  .overflow-auto {
-    transform: scale(0.62);
-    transform-origin: top left;
-    width: 161% !important;
+    margin-bottom: 8px;
   }
 
   * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
