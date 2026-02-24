@@ -25,9 +25,10 @@ interface Props {
   onNameChange: (name: string) => void
   onNeedAuth: () => void
   onToast: (msg: string) => void
+  onPresetChange: (preset: string | null) => void
 }
 
-export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast }: Props) {
+export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange }: Props) {
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>('balanced')

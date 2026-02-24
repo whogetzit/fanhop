@@ -168,6 +168,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
           onNameChange={setModelName}
           onNeedAuth={() => setShowAuth(true)}
           onToast={showToast}
+          onPresetChange={setActivePreset}
         />
         <div id="print-area" className="flex-1 overflow-auto p-3" style={{ scrollbarWidth: 'thin', ['--model-name' as any]: `"${activePreset ? activePreset.charAt(0).toUpperCase() + activePreset.slice(1) : modelName || 'My Bracket'}"` }}>
           <BracketCanvas result={result} />
