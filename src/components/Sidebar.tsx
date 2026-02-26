@@ -63,9 +63,9 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
     try {
       const result = simTournament(weights)
       await saveModelToCloud(name, { ...weights }, result.champion)
-      const models = await loadModelsFromCloud()
-      setSaved(models as CloudModel[])
-      const saved = models.find((m: any) => m.name === name)
+      const models = (await loadModelsFromCloud()) as CloudModel[]
+      setSaved(models)
+      const saved = models.find(m => m.name === name)
       if (saved) setActiveId(saved.id)
       onToast(`"${name}" saved`)
     } catch (e: any) {
