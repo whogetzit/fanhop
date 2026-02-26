@@ -11,7 +11,7 @@ interface CloudModel {
   id: string
   name: string
   champion: string | null
-  weights: Record<string, number>
+  weights: StatWeights
   updated_at: string
 }
 
@@ -76,7 +76,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }
 
   function handleLoad(model: CloudModel) {
-    onWeightsChange(model.weights as StatWeights)
+    onWeightsChange(model.weights)
     onNameChange(model.name)
     setActiveId(model.id)
     setActivePreset(null)
