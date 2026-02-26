@@ -62,7 +62,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
     setSaving(true)
     try {
       const result = simTournament(weights)
-      await saveModelToCloud(name, weights as Record<string, number>, result.champion)
+      await saveModelToCloud(name, { ...weights }, result.champion)
       const models = await loadModelsFromCloud()
       setSaved(models as CloudModel[])
       const saved = models.find((m: any) => m.name === name)
