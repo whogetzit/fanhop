@@ -1,4 +1,3 @@
-// @ts-nocheck
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
 
@@ -36,7 +35,6 @@ export async function saveModelToCloud(
   name: string,
   weights: Record<string, number>,
   champion: string,
-  isPublic = false
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
@@ -45,7 +43,7 @@ export async function saveModelToCloud(
   const { data, error } = await supabase
     .from('models')
     .upsert(
-      { user_id: user.id, name, weights, champion, is_public: isPublic, updated_at: new Date().toISOString() },
+      { user_id: user.id, name, weights, champion, updated_at: new Date().toISOString() },
       { onConflict: 'user_id,name' }
     )
     .select()
@@ -74,16 +72,4 @@ export async function deleteModelFromCloud(id: string) {
   const supabase = createClient()
   const { error } = await supabase.from('models').delete().eq('id', id)
   if (error) throw error
-}
-
-export async function getPublicModels(userId: string) {
-  const supabase = createClient()
-  const { data, error } = await supabase
-    .from('models')
-    .select('*')
-    .eq('user_id', userId)
-    .eq('is_public', true)
-    .order('updated_at', { ascending: false })
-  if (error) throw error
-  return data ?? []
 }

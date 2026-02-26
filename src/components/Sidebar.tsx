@@ -1,9 +1,8 @@
-// @ts-nocheck
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
 import type { StatWeights } from '@/types/bracket'
-import { STAT_GROUPS, STAT_LABELS, PRESETS } from '@/types/bracket'
+import { STAT_GROUPS, STAT_LABELS, PRESETS, PRESET_LABELS } from '@/types/bracket'
 import { simTournament } from '@/lib/simulation'
 import { saveModelToCloud, loadModelsFromCloud, deleteModelFromCloud } from '@/lib/supabase'
 import type { User } from '@supabase/supabase-js'
@@ -13,7 +12,6 @@ interface CloudModel {
   name: string
   champion: string | null
   weights: Record<string, number>
-  is_public: boolean
   updated_at: string
 }
 
@@ -125,7 +123,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
               background: activePreset === key ? 'var(--orange-glow)' : 'transparent',
             }}
           >
-            {key}
+            {PRESET_LABELS[key] ?? key}
           </button>
         ))}
       </div>

@@ -110,3 +110,23 @@ export function parseModelFromSearchParams(
   if (!decoded || !validateWeights(decoded.weights)) return null
   return decoded
 }
+
+export function parseModelFromUrl(url: string): ModelState | null {
+  try {
+    const u = new URL(url)
+    const m = u.searchParams.get('m')
+    if (!m) return null
+    const decoded = decodeModel(m)
+    if (!decoded || !validateWeights(decoded.weights)) return null
+    return decoded
+  } catch {
+    // Try treating input directly as the m= value
+    try {
+      const decoded = decodeModel(url)
+      if (!decoded || !validateWeights(decoded.weights)) return null
+      return decoded
+    } catch {
+      return null
+    }
+  }
+}

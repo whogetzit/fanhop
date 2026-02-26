@@ -2,6 +2,7 @@
 
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
+import { PRESET_LABELS } from '@/types/bracket'
 import { simTournament } from '@/lib/simulation'
 import { buildShareUrl, encodeModel } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
@@ -68,7 +69,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
 
   const avatarLetter = user?.email?.[0]?.toUpperCase() ?? user?.user_metadata?.name?.[0]?.toUpperCase()
   const printName = activePreset
-    ? activePreset.charAt(0).toUpperCase() + activePreset.slice(1)
+    ? PRESET_LABELS[activePreset] ?? activePreset
     : modelName || 'My Bracket'
 
   return (
@@ -103,6 +104,17 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
               </div>
             </div>
           </div>
+
+          {/* Score - desktop only */}
+          <a
+            href="/score"
+            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
+          >
+            📊 Score 2025
+          </a>
 
           {/* Print - desktop only */}
           <button
