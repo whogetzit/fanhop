@@ -52,7 +52,13 @@ function simMatchup(
 ): Matchup {
   const s1 = scoreTeam(team1, weights, teams)
   const s2 = scoreTeam(team2, weights, teams)
-  const [winner, loser] = s1 >= s2 ? [team1, team2] : [team2, team1]
+  // Tiebreak by seed (lower seed = stronger team) so all-zero sliders = chalk bracket
+  let winner: string, loser: string
+  if (s1 !== s2) {
+    [winner, loser] = s1 > s2 ? [team1, team2] : [team2, team1]
+  } else {
+    [winner, loser] = seed1 <= seed2 ? [team1, team2] : [team2, team1]
+  }
   return { team1, team2, seed1, seed2, winner, loser }
 }
 
