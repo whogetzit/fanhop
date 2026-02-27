@@ -62,8 +62,8 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
     })
     showToast('Link copied!')
     const encoded = encodeModel({ weights, name: modelName || undefined })
-    window.history.replaceState(null, '', `/bracket?m=${encoded}`)
-  }, [weights, modelName, showToast])
+    window.history.replaceState(null, '', `/bracket?m=${encoded}${presetParam}`)
+  }, [weights, modelName, activePreset, showToast])
 
   const handleSignOut = useCallback(async () => {
     await signOut()
