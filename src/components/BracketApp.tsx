@@ -40,6 +40,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
   const handleWeightsChange = useCallback((next: StatWeights, preset?: string | null) => {
     setWeights(next)
     setChaosMode(preset === 'chaos')
+    if (preset !== undefined) setActivePreset(preset)
     setResult(simTournament(next))
   }, [])
 

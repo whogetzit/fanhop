@@ -45,6 +45,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
 
   function handleSlider(stat: keyof StatWeights, val: number) {
     onWeightsChange({ ...weights, [stat]: val }, null)
+    onPresetChange(null)
     setActivePreset(null)
   }
 
@@ -52,6 +53,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
     onWeightsChange(PRESETS[key], key)
     setActivePreset(key)
     setActiveId(null)
+    onPresetChange(key)
   }
 
   async function handleSave() {
