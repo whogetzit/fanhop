@@ -1,7 +1,6 @@
 'use client'
 
 import type { TournamentResult, RegionResult, Matchup, RegionName } from '@/types/bracket'
-import { BRACKET } from '@/lib/data/2013'
 import { getSeed } from '@/lib/simulation'
 
 interface Props { result: TournamentResult }
@@ -128,17 +127,13 @@ interface RegionColProps {
   round?: 'r32' | 's16' | 'e8'
 }
 
-function makeSeedMap(regionName: RegionName): Record<string, number> {
-  const m: Record<string, number> = {}
-  for (const [s, t] of Object.entries(BRACKET[regionName])) m[t] = Number(s)
-  return m
+function winnerSeed(m: Matchup): number {
+  return m.winner === m.team1 ? m.seed1 : m.seed2
 }
 
 const R64_PAIRS: [number, number][] = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]]
 
 function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
-  const seedMap = makeSeedMap(regionName)
-
   if (!round) {
     // R64
     return (
@@ -171,7 +166,7 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset32 }} />
         {result.r32.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={seedMap[m.winner]} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
             <div style={{ height: stride32 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -185,7 +180,7 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset16 }} />
         {result.s16.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={seedMap[m.winner]} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
             <div style={{ height: stride16 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -197,14 +192,12 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
   return (
     <div className="flex flex-col" style={{ gridColumn: col, gridRow: row }}>
       <div style={{ height: offsetE8 }} />
-      <TeamSlot name={result.e8.winner} seed={seedMap[result.e8.winner]} win />
+      <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win />
     </div>
   )
 }
 
 function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
-  const seedMap = makeSeedMap(regionName)
-
   const stride32 = (SLOT_H * 2 + GAP + MU_GAP) * 2
   const stride16 = stride32 * 2
   const offset32 = SLOT_H + GAP / 2
@@ -235,7 +228,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
     return (
       <div className="flex flex-col" style={{ gridColumn: col, gridRow: row }}>
         <div style={{ height: offsetE8 }} />
-        <TeamSlot name={result.e8.winner} seed={seedMap[result.e8.winner]} win />
+        <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win />
       </div>
     )
   }
@@ -246,7 +239,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset16 }} />
         {result.s16.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={seedMap[m.winner]} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
             <div style={{ height: stride16 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -260,7 +253,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
       <div style={{ height: offset32 }} />
       {result.r32.map((m, i) => (
         <div key={i}>
-          <TeamSlot name={m.winner} seed={seedMap[m.winner]} win />
+          <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
           <div style={{ height: stride32 - SLOT_H - MU_GAP }} />
         </div>
       ))}
