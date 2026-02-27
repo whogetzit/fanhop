@@ -136,7 +136,7 @@ export function parseModelFromUrl(url: string): ModelState | null {
 // 63 bits packed into 8 bytes → ~11 base64url chars
 // Game order: for each region [Midwest,West,East,South]:
 //   8× R64, 4× R32, 2× S16, 1× E8  (15 games × 4 regions = 60)
-// Then FF1 (South vs West), FF2 (East vs Midwest), Championship = 3 more = 63 total
+// Then FF1 (Midwest vs West), FF2 (East vs South), Championship = 3 more = 63 total
 
 import type { TournamentResult, RegionName } from '@/types/bracket'
 import { BRACKET } from '@/lib/data/2025'
@@ -170,11 +170,11 @@ export function encodeBracket(result: TournamentResult): string {
     bits.push(e8.winner === e8.team1 ? 0 : 1)
   }
 
-  // FF1: South vs West winner (ff1)
-  bits.push(result.ff1.winner === result.regions.South.winner ? 0 : 1)
-  // FF2: East vs Midwest winner (ff2)
+  // FF1: Midwest vs West (bit 0 = Midwest wins, 1 = West wins)
+  bits.push(result.ff1.winner === result.regions.Midwest.winner ? 0 : 1)
+  // FF2: East vs South (bit 0 = East wins, 1 = South wins)
   bits.push(result.ff2.winner === result.regions.East.winner ? 0 : 1)
-  // Championship: ff1 winner vs ff2 winner
+  // Championship: ff1 winner vs ff2 winner (bit 0 = ff1 wins)
   bits.push(result.champion === result.ff1.winner ? 0 : 1)
 
   // Pack 63 bits into 8 bytes
@@ -245,17 +245,17 @@ export function decodeBracket(encoded: string): TournamentResult | null {
     const midwestWinner = regions.Midwest!.winner
 
     const ff1bit = bits[bitIdx++]
-    const ff1winner = ff1bit === 0 ? southWinner : westWinner
+    const ff1winner = ff1bit === 0 ? midwestWinner : westWinner
     const ff2bit = bits[bitIdx++]
-    const ff2winner = ff2bit === 0 ? eastWinner : midwestWinner
+    const ff2winner = ff2bit === 0 ? eastWinner : southWinner
     const champbit = bits[bitIdx++]
     const champion = champbit === 0 ? ff1winner : ff2winner
 
     return {
       regions: regions as Record<RegionName, any>,
-      ff1: { winner: ff1winner, loser: ff1bit === 0 ? westWinner : southWinner },
-      ff2: { winner: ff2winner, loser: ff2bit === 0 ? midwestWinner : eastWinner },
-      finalFour: [southWinner, westWinner, eastWinner, midwestWinner],
+      ff1: { winner: ff1winner, loser: ff1bit === 0 ? westWinner : midwestWinner },
+      ff2: { winner: ff2winner, loser: ff2bit === 0 ? southWinner : eastWinner },
+      finalFour: [midwestWinner, westWinner, eastWinner, southWinner],
       champion,
     }
   } catch {
