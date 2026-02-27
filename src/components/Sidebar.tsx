@@ -24,13 +24,14 @@ interface Props {
   onNeedAuth: () => void
   onToast: (msg: string) => void
   onPresetChange: (preset: string | null) => void
+  initialPreset?: string
   mobile?: boolean
 }
 
-export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, mobile }: Props) {
+export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, initialPreset, mobile }: Props) {
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [activePreset, setActivePreset] = useState<string | null>('balanced')
+  const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [saving, setSaving] = useState(false)
 
   // Load models from cloud when user signs in

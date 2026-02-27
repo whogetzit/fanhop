@@ -20,13 +20,22 @@ interface Props {
 export default function BracketApp({ initialWeights, initialName, initialPreset }: Props) {
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
-  const [result, setResult] = useState<TournamentResult>(() => { setChaosMode(initialPreset === 'chaos'); return simTournament(initialWeights) })
+  const [result, setResult] = useState<TournamentResult>(() => simTournament(initialWeights))
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
+
+  // Boot chaos mode on mount (module-level flag must be set client-side)
+  useEffect(() => {
+    if (initialPreset === 'chaos') {
+      setChaosMode(true)
+      setResult(simTournament(initialWeights))
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -169,6 +178,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
             onNeedAuth={() => setShowAuth(true)}
             onToast={showToast}
             onPresetChange={setActivePreset}
+            initialPreset={initialPreset}
           />
         </div>
 
@@ -226,6 +236,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
                   onNeedAuth={() => { setDrawerOpen(false); setShowAuth(true) }}
                   onToast={(msg) => { setDrawerOpen(false); showToast(msg) }}
                   onPresetChange={setActivePreset}
+                  initialPreset={initialPreset}
                   mobile
                 />
               </div>
