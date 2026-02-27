@@ -33,6 +33,8 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const [user, setUser] = useState<User | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [drawerOpen, setDrawerOpen] = useState(false)
+  const [showQR, setShowQR] = useState(false)
+  const [qrUrl, setQrUrl] = useState<string | null>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
@@ -78,6 +80,19 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     showToast('Link copied!')
     window.history.replaceState(null, '', url.replace(window.location.origin, ''))
   }, [weights, modelName, activePreset, result, showToast])
+
+  const handleQR = useCallback(() => {
+    let url: string
+    if (activePreset === 'chaos') {
+      const base = typeof window !== 'undefined' ? window.location.origin : ''
+      url = `${base}/bracket?b=${encodeBracket(result)}&p=chaos`
+    } else {
+      const presetParam = activePreset ? `&p=${activePreset}` : ''
+      url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+    }
+    setQrUrl(url)
+    setShowQR(true)
+  }, [weights, modelName, activePreset, result])
 
   const handleSignOut = useCallback(async () => {
     await signOut()
@@ -142,6 +157,18 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             onMouseLeave={e => (e.currentTarget.style.background = 'var(--orange)')}
           >
             Share ↗
+          </button>
+
+          {/* QR - desktop only */}
+          <button
+            onClick={handleQR}
+            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
+            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
+            title="Show QR code"
+          >
+            ▦ QR
           </button>
 
           {/* Auth */}
@@ -250,6 +277,44 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
       </div>
 
       {/* Toast */}
+      {/* QR Modal */}
+      {showQR && qrUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center"
+          style={{ background: 'rgba(0,0,0,0.75)', backdropFilter: 'blur(4px)' }}
+          onClick={() => setShowQR(false)}
+        >
+          <div
+            className="rounded-2xl p-6 flex flex-col items-center gap-4"
+            style={{ background: 'var(--navy2)', border: '2px solid var(--orange)' }}
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="font-barlowc font-bold text-lg tracking-[2px] uppercase" style={{ color: 'var(--orange)' }}>
+              Scan to open bracket
+            </div>
+            {/* QR via Google Charts API */}
+            <img
+              src={`https://chart.googleapis.com/chart?cht=qr&chs=240x240&chl=${encodeURIComponent(qrUrl)}&chco=F96A1B|0A121E&chf=bg,s,0A121E`}
+              alt="QR Code"
+              width={240}
+              height={240}
+              className="rounded-xl"
+              style={{ border: '4px solid var(--orange-glow)' }}
+            />
+            <div className="font-barlowc text-[11px] text-center max-w-[240px] break-all" style={{ color: 'var(--dim)' }}>
+              {qrUrl}
+            </div>
+            <button
+              onClick={() => setShowQR(false)}
+              className="px-5 py-2 rounded font-barlowc font-bold text-[12px] uppercase tracking-[1px] border"
+              style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
+            >
+              Close
+            </button>
+          </div>
+        </div>
+      )}
+
       {shareToast && (
         <div
           className="fixed bottom-20 sm:bottom-5 left-1/2 -translate-x-1/2 px-5 py-2 rounded-full font-barlowc font-semibold text-[13px] tracking-[0.5px] border z-50 pointer-events-none"
