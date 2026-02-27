@@ -129,29 +129,45 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
       </div>
 
       {/* Sliders — no scroll, compressed to fit */}
-      <div className="flex-1 px-3 py-1 overflow-hidden">
+      <div className="flex-1 px-3 py-1 overflow-hidden relative">
+        {/* Chaos overlay */}
+        {activePreset === 'chaos' && (
+          <div className="absolute inset-0 z-10 flex flex-col items-center justify-center gap-2 rounded"
+            style={{ background: 'rgba(10,18,30,0.82)', backdropFilter: 'blur(2px)' }}>
+            <div className="text-3xl">🎲</div>
+            <div className="font-barlowc font-bold text-[13px] uppercase tracking-[2px] text-center px-4"
+              style={{ color: 'var(--orange)' }}>
+              Sliders Ignored
+            </div>
+            <div className="font-barlowc text-[10px] text-center px-6 leading-relaxed"
+              style={{ color: 'var(--muted)' }}>
+              Chaos mode uses pure randomness. Click 🎲 Chaos again to re-roll.
+            </div>
+          </div>
+        )}
         {STAT_GROUPS.map(group => (
           <div key={group.label} className="mb-1">
             <div
               className="font-barlowc font-semibold text-[8px] uppercase tracking-[2px] mb-[2px] pb-[1px] border-b"
-              style={{ color: 'var(--orange)', borderColor: 'var(--rule)' }}
+              style={{ color: activePreset === 'chaos' ? 'var(--dim)' : 'var(--orange)', borderColor: 'var(--rule)' }}
             >
               {group.label}
             </div>
             {group.stats.map(stat => (
               <div key={stat} className="flex items-center gap-1 mb-[2px]" style={{ minWidth: 0 }}>
                 <span className="text-[10px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 96, color: 'var(--ftext)' }}>
+                  style={{ width: 96, color: activePreset === 'chaos' ? 'var(--dim)' : 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
                   type="range" min={0} max={10} step={1}
                   value={weights[stat]}
                   onChange={e => handleSlider(stat, Number(e.target.value))}
-                  style={{ height: 14, flex: '1 1 0', minWidth: 0, width: 0 }}
+                  disabled={activePreset === 'chaos'}
+                  style={{ height: 14, flex: '1 1 0', minWidth: 0, width: 0, opacity: activePreset === 'chaos' ? 0.25 : 1 }}
                 />
                 <span className="font-barlowc font-bold text-[11px] text-center"
-                  style={{ width: 20, minWidth: 20, flexShrink: 0, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
+                  style={{ width: 20, minWidth: 20, flexShrink: 0, color: activePreset === 'chaos' ? 'var(--dim)' : weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
