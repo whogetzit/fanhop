@@ -191,7 +191,7 @@ export function decodeBracket(encoded: string): TournamentResult | null {
     const bytes = fromBase64url(encoded.slice(3))
     if (bytes.length < 8) return null
 
-    const bits = []
+    const bits: number[] = []
     for (let i = 0; i < 63; i++) {
       bits.push((bytes[Math.floor(i / 8)] >> (7 - (i % 8))) & 1)
     }
