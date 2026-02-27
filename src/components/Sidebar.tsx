@@ -139,20 +139,19 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
               {group.label}
             </div>
             {group.stats.map(stat => (
-              <div key={stat} className="flex items-center gap-1 mb-[2px]">
+              <div key={stat} className="flex items-center gap-1 mb-[2px]" style={{ minWidth: 0 }}>
                 <span className="text-[10px] flex-shrink-0 overflow-hidden text-ellipsis whitespace-nowrap"
-                  style={{ width: 100, color: 'var(--ftext)' }}>
+                  style={{ width: 96, color: 'var(--ftext)' }}>
                   {STAT_LABELS[stat]}
                 </span>
                 <input
                   type="range" min={0} max={10} step={1}
                   value={weights[stat]}
                   onChange={e => handleSlider(stat, Number(e.target.value))}
-                  className="flex-1"
-                  style={{ height: 14 }}
+                  style={{ height: 14, flex: '1 1 0', minWidth: 0, width: 0 }}
                 />
-                <span className="font-barlowc font-bold text-[11px] text-right flex-shrink-0"
-                  style={{ width: 18, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
+                <span className="font-barlowc font-bold text-[11px] text-center"
+                  style={{ width: 20, minWidth: 20, flexShrink: 0, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
