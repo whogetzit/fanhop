@@ -19,7 +19,7 @@ interface Props {
   weights: StatWeights
   modelName: string
   user: User | null
-  onWeightsChange: (w: StatWeights) => void
+  onWeightsChange: (w: StatWeights, preset?: string | null) => void
   onNameChange: (name: string) => void
   onNeedAuth: () => void
   onToast: (msg: string) => void
@@ -44,12 +44,12 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }, [user])
 
   function handleSlider(stat: keyof StatWeights, val: number) {
-    onWeightsChange({ ...weights, [stat]: val })
+    onWeightsChange({ ...weights, [stat]: val }, null)
     setActivePreset(null)
   }
 
   function applyPreset(key: string) {
-    onWeightsChange(PRESETS[key])
+    onWeightsChange(PRESETS[key], key)
     setActivePreset(key)
     setActiveId(null)
   }
@@ -76,7 +76,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   }
 
   function handleLoad(model: CloudModel) {
-    onWeightsChange(model.weights)
+    onWeightsChange(model.weights, null)
     onNameChange(model.name)
     setActiveId(model.id)
     setActivePreset(null)

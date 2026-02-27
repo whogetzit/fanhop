@@ -42,6 +42,12 @@ export function scoreTeam(name: string, weights: StatWeights, teams?: Record<str
   return score
 }
 
+// ─── Chaos mode flag ─────────────────────────────────────────────────────────
+// When true, outcomes are probabilistic — upsets happen based on seed gap
+
+let chaosMode = false
+export function setChaosMode(on: boolean) { chaosMode = on }
+
 // ─── Simulate a single matchup ────────────────────────────────────────────────
 
 function simMatchup(
@@ -50,15 +56,31 @@ function simMatchup(
   weights: StatWeights,
   teams?: Record<string, TeamStats>,
 ): Matchup {
-  const s1 = scoreTeam(team1, weights, teams)
-  const s2 = scoreTeam(team2, weights, teams)
-  // Tiebreak by seed (lower seed = stronger team) so all-zero sliders = chalk bracket
   let winner: string, loser: string
-  if (s1 !== s2) {
-    [winner, loser] = s1 > s2 ? [team1, team2] : [team2, team1]
+
+  if (chaosMode) {
+    // In chaos mode: probability of upset scales with seed gap
+    // A 1 vs 16 has ~15% upset chance; a 7 vs 10 is nearly 50/50
+    const favorite = seed1 <= seed2 ? team1 : team2
+    const favSeed   = seed1 <= seed2 ? seed1  : seed2
+    const dog       = seed1 <= seed2 ? team2 : team1
+    const dogSeed   = seed1 <= seed2 ? seed2  : seed1
+    const seedGap   = dogSeed - favSeed  // 0–15
+    // Upset probability: ranges from ~48% (gap=1) down to ~8% (gap=15)
+    const upsetProb = 0.50 - (seedGap / 15) * 0.42
+    const upset     = Math.random() < upsetProb
+    ;[winner, loser] = upset ? [dog, favorite] : [favorite, dog]
   } else {
-    [winner, loser] = seed1 <= seed2 ? [team1, team2] : [team2, team1]
+    const s1 = scoreTeam(team1, weights, teams)
+    const s2 = scoreTeam(team2, weights, teams)
+    // Tiebreak by seed (lower seed = stronger team) so all-zero sliders = chalk bracket
+    if (s1 !== s2) {
+      [winner, loser] = s1 > s2 ? [team1, team2] : [team2, team1]
+    } else {
+      [winner, loser] = seed1 <= seed2 ? [team1, team2] : [team2, team1]
+    }
   }
+
   return { team1, team2, seed1, seed2, winner, loser }
 }
 

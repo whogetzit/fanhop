@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
-import { simTournament } from '@/lib/simulation'
+import { simTournament, setChaosMode } from '@/lib/simulation'
 import { buildShareUrl, encodeModel } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
@@ -36,8 +36,9 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
     return () => subscription.unsubscribe()
   }, [])
 
-  const handleWeightsChange = useCallback((next: StatWeights) => {
+  const handleWeightsChange = useCallback((next: StatWeights, preset?: string | null) => {
     setWeights(next)
+    setChaosMode(preset === 'chaos')
     setResult(simTournament(next))
   }, [])
 

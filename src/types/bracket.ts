@@ -75,9 +75,10 @@ export const PRESET_LABELS: Record<string, string> = {
   offense:       "Offense",
   defense:       "Defense",
   chalk:         "Chalk",
-  chaos:         "Chaos",
+  chaos:         "🎲 Chaos",
   hindsight2025: "2025 Hindsight",
 }
+
 
 // ─── Team data ───────────────────────────────────────────────────────────────
 
