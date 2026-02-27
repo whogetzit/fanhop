@@ -4,10 +4,9 @@ import type {
   Matchup, RegionResult, TournamentResult,
 } from '@/types/bracket'
 import { TEAMS as TEAMS_2013, BRACKET as BRACKET_2013 } from '@/lib/data/2013'
-import { TEAMS as TEAMS_2025, BRACKET as BRACKET_2025, RESULTS_2025 } from '@/lib/data/2025'
+import { TEAMS as TEAMS_2025, BRACKET as BRACKET_2025 } from '@/lib/data/2025'
 
 export type TournamentYear = '2013' | '2025'
-export { RESULTS_2025 }
 
 const MAX_RANK = 350
 
@@ -144,59 +143,6 @@ export function simTournament(weights: StatWeights, bracket?: BracketData, teams
     finalFour: [regions.Midwest.winner, regions.West.winner, regions.East.winner, regions.South.winner],
     champion:  championship.winner,
   }
-}
-
-// ─── Score a simulated bracket against actual 2025 results ───────────────────
-// Standard scoring: R64=1, R32=2, S16=4, E8=8, FF=16, Champ=32
-
-export function scoreBracket2025(sim: TournamentResult): { total: number; breakdown: Record<string, number> } {
-  const r = RESULTS_2025
-  let total = 0
-  const breakdown: Record<string, number> = { r64: 0, r32: 0, s16: 0, e8: 0, ff: 0, champ: 0 }
-
-  const regions = ['South', 'East', 'Midwest', 'West'] as RegionName[]
-  for (const region of regions) {
-    const actual = r[region]
-    const predicted = sim.regions[region]
-
-    // R64 (1pt each, 8 games per region)
-    for (let i = 0; i < 8; i++) {
-      if (predicted.r64[i]?.winner === actual.r64[i]) {
-        total += 1; breakdown.r64 += 1
-      }
-    }
-    // R32 (2pts each, 4 games)
-    for (let i = 0; i < 4; i++) {
-      if (predicted.r32[i]?.winner === actual.r32[i]) {
-        total += 2; breakdown.r32 += 2
-      }
-    }
-    // S16 (4pts each, 2 games)
-    for (let i = 0; i < 2; i++) {
-      if (predicted.s16[i]?.winner === actual.s16[i]) {
-        total += 4; breakdown.s16 += 4
-      }
-    }
-    // E8 (8pts)
-    if (predicted.e8?.winner === actual.e8) {
-      total += 8; breakdown.e8 += 8
-    }
-  }
-
-  // Final Four (16pts each) - actual FF: Auburn, Florida, Duke, Houston
-  const actualFF = new Set(r.finalFour)
-  for (const team of sim.finalFour) {
-    if (actualFF.has(team)) {
-      total += 16; breakdown.ff += 16
-    }
-  }
-
-  // Championship (32pts) - Florida beat Houston
-  if (sim.champion === r.champion) {
-    total += 32; breakdown.champ += 32
-  }
-
-  return { total, breakdown }
 }
 
 // ─── Seed lookup helper ───────────────────────────────────────────────────────

@@ -105,17 +105,6 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
             </div>
           </div>
 
-          {/* Score - desktop only */}
-          <a
-            href="/score"
-            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
-            style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
-            onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
-          >
-            📊 Score 2025
-          </a>
-
           {/* Print - desktop only */}
           <button
             onClick={() => window.print()}
