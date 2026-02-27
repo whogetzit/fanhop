@@ -4,7 +4,7 @@ import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
 import { simTournament, setChaosMode } from '@/lib/simulation'
-import { buildShareUrl, encodeModel } from '@/lib/encoding'
+import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
 import BracketCanvas from './BracketCanvas'
@@ -15,27 +15,25 @@ interface Props {
   initialWeights: StatWeights
   initialName?: string
   initialPreset?: string
+  initialResult?: TournamentResult
 }
 
-export default function BracketApp({ initialWeights, initialName, initialPreset }: Props) {
+export default function BracketApp({ initialWeights, initialName, initialPreset, initialResult }: Props) {
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
-  const [result, setResult] = useState<TournamentResult>(() => simTournament(initialWeights))
+  const [result, setResult] = useState<TournamentResult>(() => {
+    // Must set chaos mode before simulating — only on client (not SSR)
+    if (typeof window !== 'undefined' && initialPreset === 'chaos') {
+      setChaosMode(true)
+    }
+    return simTournament(initialWeights)
+  })
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
   const [user, setUser] = useState<User | null>(null)
   const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
-
-  // Boot chaos mode on mount (module-level flag must be set client-side)
-  useEffect(() => {
-    if (initialPreset === 'chaos') {
-      setChaosMode(true)
-      setResult(simTournament(initialWeights))
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
 
   useEffect(() => {
     const supabase = createClient()
@@ -60,8 +58,15 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
   }, [])
 
   const handleShare = useCallback(() => {
-    const presetParam = activePreset ? `&p=${activePreset}` : ''
-    const url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+    let url: string
+    if (activePreset === 'chaos') {
+      const base = typeof window !== 'undefined' ? window.location.origin : ''
+      const bracketEncoded = encodeBracket(result)
+      url = `${base}/bracket?b=${bracketEncoded}&p=chaos`
+    } else {
+      const presetParam = activePreset ? `&p=${activePreset}` : ''
+      url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+    }
     navigator.clipboard.writeText(url).catch(() => {
       const el = document.createElement('input')
       el.value = url
@@ -71,9 +76,8 @@ export default function BracketApp({ initialWeights, initialName, initialPreset 
       document.body.removeChild(el)
     })
     showToast('Link copied!')
-    const encoded = encodeModel({ weights, name: modelName || undefined })
-    window.history.replaceState(null, '', `/bracket?m=${encoded}${presetParam}`)
-  }, [weights, modelName, activePreset, showToast])
+    window.history.replaceState(null, '', url.replace(window.location.origin, ''))
+  }, [weights, modelName, activePreset, result, showToast])
 
   const handleSignOut = useCallback(async () => {
     await signOut()

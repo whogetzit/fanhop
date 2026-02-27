@@ -130,3 +130,135 @@ export function parseModelFromUrl(url: string): ModelState | null {
     }
   }
 }
+
+// ─── Bracket result encoding ──────────────────────────────────────────────────
+// Encodes all 63 game outcomes as 1 bit each (0=team1 wins, 1=team2 wins)
+// 63 bits packed into 8 bytes → ~11 base64url chars
+// Game order: for each region [Midwest,West,East,South]:
+//   8× R64, 4× R32, 2× S16, 1× E8  (15 games × 4 regions = 60)
+// Then FF1 (South vs West), FF2 (East vs Midwest), Championship = 3 more = 63 total
+
+import type { TournamentResult, RegionName } from '@/types/bracket'
+import { BRACKET } from '@/lib/data/2025'
+
+const REGIONS: RegionName[] = ['Midwest', 'West', 'East', 'South']
+const R64_PAIRS_ENC: [number, number][] = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]]
+
+export function encodeBracket(result: TournamentResult): string {
+  const bits: number[] = []
+
+  for (const region of REGIONS) {
+    const reg = result.regions[region]
+    const b = BRACKET[region]
+    // R64 (8 games)
+    for (let i = 0; i < 8; i++) {
+      const m = reg.r64[i]
+      bits.push(m.winner === m.team1 ? 0 : 1)
+    }
+    // R32 (4 games)
+    for (let i = 0; i < 4; i++) {
+      const m = reg.r32[i]
+      bits.push(m.winner === m.team1 ? 0 : 1)
+    }
+    // S16 (2 games)
+    for (let i = 0; i < 2; i++) {
+      const m = reg.s16[i]
+      bits.push(m.winner === m.team1 ? 0 : 1)
+    }
+    // E8 (1 game)
+    const e8 = reg.e8
+    bits.push(e8.winner === e8.team1 ? 0 : 1)
+  }
+
+  // FF1: South vs West winner (ff1)
+  bits.push(result.ff1.winner === result.regions.South.winner ? 0 : 1)
+  // FF2: East vs Midwest winner (ff2)
+  bits.push(result.ff2.winner === result.regions.East.winner ? 0 : 1)
+  // Championship: ff1 winner vs ff2 winner
+  bits.push(result.champion === result.ff1.winner ? 0 : 1)
+
+  // Pack 63 bits into 8 bytes
+  const bytes = new Uint8Array(8)
+  for (let i = 0; i < bits.length; i++) {
+    if (bits[i]) bytes[Math.floor(i / 8)] |= (1 << (7 - (i % 8)))
+  }
+  return 'b1:' + toBase64url(bytes)
+}
+
+export function decodeBracket(encoded: string): TournamentResult | null {
+  try {
+    if (!encoded.startsWith('b1:')) return null
+    const bytes = fromBase64url(encoded.slice(3))
+    if (bytes.length < 8) return null
+
+    const bits = []
+    for (let i = 0; i < 63; i++) {
+      bits.push((bytes[Math.floor(i / 8)] >> (7 - (i % 8))) & 1)
+    }
+
+    let bitIdx = 0
+    const regions: Partial<Record<RegionName, any>> = {}
+
+    for (const region of REGIONS) {
+      const b = BRACKET[region]
+      const seeds = R64_PAIRS_ENC
+      // Reconstruct r64
+      const r64 = seeds.map(([s1, s2], i) => {
+        const team1 = b[s1], team2 = b[s2]
+        const bit = bits[bitIdx++]
+        const winner = bit === 0 ? team1 : team2
+        const loser  = bit === 0 ? team2 : team1
+        return { team1, team2, seed1: s1, seed2: s2, winner, loser }
+      })
+      // r32
+      const r32 = [0,1,2,3].map(i => {
+        const team1 = r64[i*2].winner, team2 = r64[i*2+1].winner
+        const s1 = r64[i*2].winner === r64[i*2].team1 ? r64[i*2].seed1 : r64[i*2].seed2
+        const s2 = r64[i*2+1].winner === r64[i*2+1].team1 ? r64[i*2+1].seed1 : r64[i*2+1].seed2
+        const bit = bits[bitIdx++]
+        const winner = bit === 0 ? team1 : team2
+        return { team1, team2, seed1: s1, seed2: s2, winner, loser: bit === 0 ? team2 : team1 }
+      })
+      // s16
+      const s16 = [0,1].map(i => {
+        const team1 = r32[i*2].winner, team2 = r32[i*2+1].winner
+        const s1 = r32[i*2].winner === r32[i*2].team1 ? r32[i*2].seed1 : r32[i*2].seed2
+        const s2 = r32[i*2+1].winner === r32[i*2+1].team1 ? r32[i*2+1].seed1 : r32[i*2+1].seed2
+        const bit = bits[bitIdx++]
+        const winner = bit === 0 ? team1 : team2
+        return { team1, team2, seed1: s1, seed2: s2, winner, loser: bit === 0 ? team2 : team1 }
+      })
+      // e8
+      const team1 = s16[0].winner, team2 = s16[1].winner
+      const s1 = s16[0].winner === s16[0].team1 ? s16[0].seed1 : s16[0].seed2
+      const s2 = s16[1].winner === s16[1].team1 ? s16[1].seed1 : s16[1].seed2
+      const bit = bits[bitIdx++]
+      const e8winner = bit === 0 ? team1 : team2
+      const e8 = { team1, team2, seed1: s1, seed2: s2, winner: e8winner, loser: bit === 0 ? team2 : team1 }
+
+      regions[region] = { r64, r32, s16, e8, winner: e8winner }
+    }
+
+    const southWinner = regions.South!.winner
+    const westWinner  = regions.West!.winner
+    const eastWinner  = regions.East!.winner
+    const midwestWinner = regions.Midwest!.winner
+
+    const ff1bit = bits[bitIdx++]
+    const ff1winner = ff1bit === 0 ? southWinner : westWinner
+    const ff2bit = bits[bitIdx++]
+    const ff2winner = ff2bit === 0 ? eastWinner : midwestWinner
+    const champbit = bits[bitIdx++]
+    const champion = champbit === 0 ? ff1winner : ff2winner
+
+    return {
+      regions: regions as Record<RegionName, any>,
+      ff1: { winner: ff1winner, loser: ff1bit === 0 ? westWinner : southWinner },
+      ff2: { winner: ff2winner, loser: ff2bit === 0 ? midwestWinner : eastWinner },
+      finalFour: [southWinner, westWinner, eastWinner, midwestWinner],
+      champion,
+    }
+  } catch {
+    return null
+  }
+}
