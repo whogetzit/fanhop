@@ -14,16 +14,17 @@ import type { User } from '@supabase/supabase-js'
 interface Props {
   initialWeights: StatWeights
   initialName?: string
+  initialPreset?: string
 }
 
-export default function BracketApp({ initialWeights, initialName }: Props) {
+export default function BracketApp({ initialWeights, initialName, initialPreset }: Props) {
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
-  const [result, setResult] = useState<TournamentResult>(() => simTournament(initialWeights))
+  const [result, setResult] = useState<TournamentResult>(() => { setChaosMode(initialPreset === 'chaos'); return simTournament(initialWeights) })
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
   const [user, setUser] = useState<User | null>(null)
-  const [activePreset, setActivePreset] = useState<string | null>('balanced')
+  const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
 
@@ -49,7 +50,8 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
   }, [])
 
   const handleShare = useCallback(() => {
-    const url = buildShareUrl({ weights, name: modelName || undefined })
+    const presetParam = activePreset ? `&p=${activePreset}` : ''
+    const url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
     navigator.clipboard.writeText(url).catch(() => {
       const el = document.createElement('input')
       el.value = url
