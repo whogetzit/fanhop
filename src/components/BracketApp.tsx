@@ -87,7 +87,7 @@ export default function BracketApp({ initialWeights, initialName }: Props) {
           className="font-barlowc text-[11px] tracking-[2px] uppercase border-l pl-3 sm:pl-5 hidden sm:block"
           style={{ color: 'var(--muted)', borderColor: 'var(--rule)' }}
         >
-          2013 NCAA Tournament · Model Builder
+          2025 NCAA Tournament · Model Builder
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">

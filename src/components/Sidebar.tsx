@@ -152,7 +152,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
                   style={{ height: 14 }}
                 />
                 <span className="font-barlowc font-bold text-[11px] text-right flex-shrink-0"
-                  style={{ width: 14, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
+                  style={{ width: 18, color: weights[stat] === 0 ? 'var(--dim)' : 'var(--orange)' }}>
                   {weights[stat]}
                 </span>
               </div>
