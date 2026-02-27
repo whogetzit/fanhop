@@ -67,7 +67,7 @@ export const PRESETS: Record<string, StatWeights> = {
   defense:  { ppg:2, fg_pct:3, three_pg:1, ft_pct:2, scr_mar:5, opp_ppg:9, opp_fg_pct:9, bkpg:5, stpg:6, reb_mar:5, apg:2, ast_to:3, topg:3, opp_topg:6, win_pct:4, rpi:5, conf_strength:3 },
   chalk:    { ppg:3, fg_pct:3, three_pg:2, ft_pct:2, scr_mar:4, opp_ppg:3, opp_fg_pct:3, bkpg:2, stpg:2, reb_mar:3, apg:2, ast_to:3, topg:2, opp_topg:2, win_pct:3, rpi:10, conf_strength:9 },
   chaos:         { ppg:4, fg_pct:4, three_pg:7, ft_pct:2, scr_mar:3, opp_ppg:4, opp_fg_pct:3, bkpg:3, stpg:7, reb_mar:4, apg:5, ast_to:4, topg:5, opp_topg:5, win_pct:2, rpi:1, conf_strength:1 },
-  hindsight2025: { ppg:0, fg_pct:0, three_pg:1, ft_pct:3, scr_mar:6, opp_ppg:7, opp_fg_pct:6, bkpg:9, stpg:10, reb_mar:10, apg:0, ast_to:1, topg:1, opp_topg:0, win_pct:5, rpi:3, conf_strength:8 },
+  hindsight2025: { ppg:0, fg_pct:2, three_pg:9, ft_pct:0, scr_mar:1, opp_ppg:6, opp_fg_pct:3, bkpg:0, stpg:2, reb_mar:0, apg:0, ast_to:2, topg:2, opp_topg:1, win_pct:4, rpi:0, conf_strength:6 },
 }
 
 export const PRESET_LABELS: Record<string, string> = {
