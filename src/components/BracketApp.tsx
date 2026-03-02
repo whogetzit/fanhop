@@ -9,6 +9,7 @@ import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
 import BracketCanvas from './BracketCanvas'
 import AuthModal from './AuthModal'
+import QRCode from './QRCode'
 import type { User } from '@supabase/supabase-js'
 
 interface Props {
@@ -292,15 +293,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             <div className="font-barlowc font-bold text-lg tracking-[2px] uppercase" style={{ color: 'var(--orange)' }}>
               Scan to open bracket
             </div>
-            {/* QR via Google Charts API */}
-            <img
-              src={`https://chart.googleapis.com/chart?cht=qr&chs=240x240&chl=${encodeURIComponent(qrUrl)}&chco=F96A1B|0A121E&chf=bg,s,0A121E`}
-              alt="QR Code"
-              width={240}
-              height={240}
-              className="rounded-xl"
-              style={{ border: '4px solid var(--orange-glow)' }}
-            />
+            <QRCode url={qrUrl} size={240} />
             <div className="font-barlowc text-[11px] text-center max-w-[240px] break-all" style={{ color: 'var(--dim)' }}>
               {qrUrl}
             </div>
