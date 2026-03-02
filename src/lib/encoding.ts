@@ -182,12 +182,12 @@ export function encodeBracket(result: TournamentResult): string {
   for (let i = 0; i < bits.length; i++) {
     if (bits[i]) bytes[Math.floor(i / 8)] |= (1 << (7 - (i % 8)))
   }
-  return 'b1:' + toBase64url(bytes)
+  return 'b1-' + toBase64url(bytes)
 }
 
 export function decodeBracket(encoded: string): TournamentResult | null {
   try {
-    if (!encoded.startsWith('b1:')) return null
+    if (!encoded.startsWith('b1-')) return null
     const bytes = fromBase64url(encoded.slice(3))
     if (bytes.length < 8) return null
 

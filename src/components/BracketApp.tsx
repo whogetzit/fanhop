@@ -65,7 +65,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     let url: string
     if (activePreset === 'chaos') {
       const base = typeof window !== 'undefined' ? window.location.origin : ''
-      const bracketEncoded = encodeBracket(result)
+      const bracketEncoded = encodeURIComponent(encodeBracket(result))
       url = `${base}/bracket?b=${bracketEncoded}&p=chaos`
     } else {
       const presetParam = activePreset ? `&p=${activePreset}` : ''
@@ -87,7 +87,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     let url: string
     if (activePreset === 'chaos') {
       const base = typeof window !== 'undefined' ? window.location.origin : ''
-      url = `${base}/bracket?b=${encodeBracket(result)}&p=chaos`
+      url = `${base}/bracket?b=${encodeURIComponent(encodeBracket(result))}&p=chaos`
     } else {
       const presetParam = activePreset ? `&p=${activePreset}` : ''
       url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
