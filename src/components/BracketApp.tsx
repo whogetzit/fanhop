@@ -27,7 +27,8 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     if (typeof window !== 'undefined' && initialPreset === 'chaos') {
       setChaosMode(true)
     }
-    return simTournament(initialWeights)
+    // Use pre-decoded bracket result if provided (e.g. shared chaos bracket URL)
+    return initialResult ?? simTournament(initialWeights)
   })
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
