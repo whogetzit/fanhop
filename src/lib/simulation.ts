@@ -42,12 +42,6 @@ export function scoreTeam(name: string, weights: StatWeights, teams?: Record<str
   return score
 }
 
-// ─── Chaos mode flag ─────────────────────────────────────────────────────────
-// When true, outcomes are probabilistic — upsets happen based on seed gap
-
-let chaosMode = false
-export function setChaosMode(on: boolean) { chaosMode = on }
-
 // ─── Simulate a single matchup ────────────────────────────────────────────────
 
 function simMatchup(
@@ -55,10 +49,11 @@ function simMatchup(
   team2: string, seed2: number,
   weights: StatWeights,
   teams?: Record<string, TeamStats>,
+  chaos = false,
 ): Matchup {
   let winner: string, loser: string
 
-  if (chaosMode) {
+  if (chaos) {
     // In chaos mode: probability of upset scales with seed gap
     // A 1 vs 16 has ~15% upset chance; a 7 vs 10 is nearly 50/50
     const favorite = seed1 <= seed2 ? team1 : team2
@@ -99,31 +94,31 @@ function makeSeedMap(region: RegionName, bracket?: BracketData): Record<string, 
   return map
 }
 
-export function simRegion(regionName: RegionName, weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>): RegionResult {
+export function simRegion(regionName: RegionName, weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>, chaos = false): RegionResult {
   const b = bracket || activeBracket
   const seeding = b[regionName]
   const seedMap = makeSeedMap(regionName, b)
 
   const r64: Matchup[] = R64_PAIRS.map(([s1, s2]) =>
-    simMatchup(seeding[s1], s1, seeding[s2], s2, weights, teams)
+    simMatchup(seeding[s1], s1, seeding[s2], s2, weights, teams, chaos)
   )
 
   const r32: Matchup[] = [0, 1, 2, 3].map(i => {
     const a = r64[i * 2]
     const b2 = r64[i * 2 + 1]
-    return simMatchup(a.winner, seedMap[a.winner], b2.winner, seedMap[b2.winner], weights, teams)
+    return simMatchup(a.winner, seedMap[a.winner], b2.winner, seedMap[b2.winner], weights, teams, chaos)
   })
 
   const s16: Matchup[] = [0, 1].map(i => {
     const a = r32[i * 2]
     const b2 = r32[i * 2 + 1]
-    return simMatchup(a.winner, seedMap[a.winner], b2.winner, seedMap[b2.winner], weights, teams)
+    return simMatchup(a.winner, seedMap[a.winner], b2.winner, seedMap[b2.winner], weights, teams, chaos)
   })
 
   const e8 = simMatchup(
     s16[0].winner, seedMap[s16[0].winner],
     s16[1].winner, seedMap[s16[1].winner],
-    weights, teams
+    weights, teams, chaos
   )
 
   return { r64, r32, s16, e8, winner: e8.winner }
@@ -131,12 +126,12 @@ export function simRegion(regionName: RegionName, weights: StatWeights, bracket?
 
 // ─── Simulate the full tournament ────────────────────────────────────────────
 
-export function simTournament(weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>): TournamentResult {
+export function simTournament(weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>, chaos = false): TournamentResult {
   const b = bracket || activeBracket
   const t = teams || activeTeams
 
   const regions = (['Midwest', 'West', 'East', 'South'] as RegionName[]).reduce(
-    (acc, r) => ({ ...acc, [r]: simRegion(r, weights, b, t) }),
+    (acc, r) => ({ ...acc, [r]: simRegion(r, weights, b, t, chaos) }),
     {} as Record<RegionName, RegionResult>
   )
 
@@ -150,18 +145,18 @@ export function simTournament(weights: StatWeights, bracket?: BracketData, teams
   const ff1 = simMatchup(
     regions.Midwest.winner, seedMap[regions.Midwest.winner],
     regions.West.winner,    seedMap[regions.West.winner],
-    weights, t
+    weights, t, chaos
   )
   const ff2 = simMatchup(
     regions.East.winner,  seedMap[regions.East.winner],
     regions.South.winner, seedMap[regions.South.winner],
-    weights, t
+    weights, t, chaos
   )
 
   const championship = simMatchup(
     ff1.winner, seedMap[ff1.winner],
     ff2.winner, seedMap[ff2.winner],
-    weights, t
+    weights, t, chaos
   )
 
   return {
