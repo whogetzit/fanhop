@@ -37,6 +37,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qrUrl, setQrUrl] = useState<string | null>(null)
+  const [pdfLoading, setPdfLoading] = useState(false)
   const [bracketScale, setBracketScale] = useState(1)
   const canvasRef = useRef<HTMLDivElement>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
@@ -120,6 +121,19 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     ? PRESET_LABELS[activePreset] ?? activePreset
     : modelName || 'My Bracket'
 
+  const handleDownloadPdf = useCallback(async () => {
+    setPdfLoading(true)
+    try {
+      const { exportBracketPdf } = await import('@/lib/exportPdf')
+      await exportBracketPdf(result, printName)
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      showToast('PDF export failed')
+    } finally {
+      setPdfLoading(false)
+    }
+  }, [result, printName, showToast])
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       {/* Header */}
@@ -153,15 +167,16 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             </div>
           </div>
 
-          {/* Print - desktop only */}
+          {/* PDF download - desktop only */}
           <button
-            onClick={() => window.print()}
-            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            onClick={handleDownloadPdf}
+            disabled={pdfLoading}
+            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block disabled:opacity-50"
             style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+            onMouseEnter={e => { if (!pdfLoading) { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' } }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
           >
-            🖨 Print
+            {pdfLoading ? '⏳ Saving…' : '📥 PDF'}
           </button>
 
           {/* Share */}
