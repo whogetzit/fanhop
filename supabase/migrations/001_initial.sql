@@ -80,20 +80,3 @@ CREATE TRIGGER sync_like_count_trigger
   AFTER INSERT OR DELETE ON model_likes
   FOR EACH ROW EXECUTE FUNCTION sync_like_count();
 
--- ─── Leaderboard view (Phase 3) ───────────────────────────────────────────────
-
-CREATE OR REPLACE VIEW leaderboard AS
-SELECT
-  m.id,
-  m.name,
-  m.champion,
-  m.total_points,
-  m.like_count,
-  m.created_at,
-  ROW_NUMBER() OVER (ORDER BY m.total_points DESC, m.like_count DESC) AS rank,
-  au.email AS user_email
-FROM models m
-JOIN auth.users au ON m.user_id = au.id
-WHERE m.is_public = true
-ORDER BY m.total_points DESC, m.like_count DESC
-LIMIT 100;
