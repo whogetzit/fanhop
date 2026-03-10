@@ -119,7 +119,7 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
           <button
             key={key}
             onClick={() => applyPreset(key)}
-            className="px-2 py-[3px] rounded text-[10px] font-barlowc font-semibold uppercase tracking-[1px] border transition-all"
+            className="px-2 py-[3px] min-h-[32px] sm:min-h-0 rounded text-[10px] font-barlowc font-semibold uppercase tracking-[1px] border transition-all"
             style={{
               borderColor: activePreset === key ? 'var(--orange)' : 'var(--dim)',
               color: activePreset === key ? 'var(--orange)' : 'var(--muted)',
