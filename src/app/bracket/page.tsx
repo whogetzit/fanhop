@@ -1,5 +1,5 @@
 import type { Metadata } from 'next'
-import { parseModelFromSearchParams } from '@/lib/encoding'
+import { parseModelFromSearchParams, decodeBracket } from '@/lib/encoding'
 import { simTournament } from '@/lib/simulation'
 import { DEFAULT_WEIGHTS } from '@/types/bracket'
 import BracketApp from '@/components/BracketApp'
@@ -10,8 +10,11 @@ interface Props {
 
 export async function generateMetadata({ searchParams }: Props): Promise<Metadata> {
   const model = parseModelFromSearchParams(searchParams)
+  const b = searchParams['b']
+  const bracketResult = b ? decodeBracket(b) : null
+
   const weights = model?.weights ?? DEFAULT_WEIGHTS
-  const result = simTournament(weights)
+  const result = bracketResult ?? simTournament(weights)
   const name = model?.name ?? 'My Bracket'
   const m = searchParams['m']
 
@@ -34,11 +37,16 @@ export async function generateMetadata({ searchParams }: Props): Promise<Metadat
 
 export default function BracketPage({ searchParams }: Props) {
   const model = parseModelFromSearchParams(searchParams)
+  const b = searchParams['b']
+  const p = searchParams['p']
+  const bracketResult = b ? decodeBracket(b) : null
 
   return (
     <BracketApp
       initialWeights={model?.weights ?? DEFAULT_WEIGHTS}
       initialName={model?.name}
+      initialPreset={p}
+      initialResult={bracketResult ?? undefined}
     />
   )
 }
