@@ -19,19 +19,18 @@ interface Props {
   weights: StatWeights
   modelName: string
   user: User | null
+  activePreset: string | null
   onWeightsChange: (w: StatWeights, preset?: string | null) => void
   onNameChange: (name: string) => void
   onNeedAuth: () => void
   onToast: (msg: string) => void
   onPresetChange: (preset: string | null) => void
-  initialPreset?: string
   mobile?: boolean
 }
 
-export default function Sidebar({ weights, modelName, user, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, initialPreset, mobile }: Props) {
+export default function Sidebar({ weights, modelName, user, activePreset, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, mobile }: Props) {
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
-  const [activePreset, setActivePreset] = useState<string | null>(initialPreset ?? 'balanced')
   const [saving, setSaving] = useState(false)
 
   // Load models from cloud when user signs in
@@ -47,12 +46,10 @@ export default function Sidebar({ weights, modelName, user, onWeightsChange, onN
   function handleSlider(stat: keyof StatWeights, val: number) {
     onWeightsChange({ ...weights, [stat]: val }, null)
     onPresetChange(null)
-    setActivePreset(null)
   }
 
   function applyPreset(key: string) {
     onWeightsChange(PRESETS[key], key)
-    setActivePreset(key)
     setActiveId(null)
     onPresetChange(key)
   }

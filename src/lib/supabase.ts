@@ -5,10 +5,10 @@ import type { Database } from '@/types/database'
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
 
 export function createClient() {
-  return createBrowserClient<Database>(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-  )
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL
+  const key = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  if (!url || !key) return null as any
+  return createBrowserClient<Database>(url, key)
 }
 
 export async function signInWithGoogle() {

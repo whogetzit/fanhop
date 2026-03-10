@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
-import { simTournament, setChaosMode } from '@/lib/simulation'
+import { simTournament } from '@/lib/simulation'
 import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
@@ -22,13 +22,9 @@ interface Props {
 export default function BracketApp({ initialWeights, initialName, initialPreset, initialResult }: Props) {
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
-  const [result, setResult] = useState<TournamentResult>(() => {
-    // Must set chaos mode before simulating — only on client (not SSR)
-    if (typeof window !== 'undefined' && initialPreset === 'chaos') {
-      setChaosMode(true)
-    }
-    return simTournament(initialWeights)
-  })
+  const [result, setResult] = useState<TournamentResult>(() =>
+    simTournament(initialWeights, undefined, undefined, initialPreset === 'chaos')
+  )
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
   const [user, setUser] = useState<User | null>(null)
@@ -40,6 +36,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
 
   useEffect(() => {
     const supabase = createClient()
+    if (!supabase) return
     supabase.auth.getUser().then(({ data }) => setUser(data.user))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_, session) => {
       setUser(session?.user ?? null)
@@ -49,9 +46,8 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
 
   const handleWeightsChange = useCallback((next: StatWeights, preset?: string | null) => {
     setWeights(next)
-    setChaosMode(preset === 'chaos')
     if (preset !== undefined) setActivePreset(preset)
-    setResult(simTournament(next))
+    setResult(simTournament(next, undefined, undefined, preset === 'chaos'))
   }, [])
 
   const showToast = useCallback((msg: string) => {
@@ -205,12 +201,12 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             weights={weights}
             modelName={modelName}
             user={user}
+            activePreset={activePreset}
             onWeightsChange={handleWeightsChange}
             onNameChange={setModelName}
             onNeedAuth={() => setShowAuth(true)}
             onToast={showToast}
             onPresetChange={setActivePreset}
-            initialPreset={initialPreset}
           />
         </div>
 
@@ -263,12 +259,12 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
                   weights={weights}
                   modelName={modelName}
                   user={user}
+                  activePreset={activePreset}
                   onWeightsChange={handleWeightsChange}
                   onNameChange={setModelName}
                   onNeedAuth={() => { setDrawerOpen(false); setShowAuth(true) }}
                   onToast={(msg) => { setDrawerOpen(false); showToast(msg) }}
                   onPresetChange={setActivePreset}
-                  initialPreset={initialPreset}
                   mobile
                 />
               </div>
