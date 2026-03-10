@@ -23,6 +23,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
   const [result, setResult] = useState<TournamentResult>(() => {
+    if (initialResult) return initialResult
     // Must set chaos mode before simulating — only on client (not SSR)
     if (typeof window !== 'undefined' && initialPreset === 'chaos') {
       setChaosMode(true)
