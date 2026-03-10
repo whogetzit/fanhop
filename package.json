@@ -14,7 +14,7 @@
     "@supabase/supabase-js": "^2.44.2",
     "@vercel/og": "^0.6.2",
     "jspdf": "^4.2.0",
-    "next": "14.2.5",
+    "next": "^14.2.35",
     "qrcode.react": "^4.2.0",
     "react": "^18",
     "react-dom": "^18"
