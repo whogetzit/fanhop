@@ -19,10 +19,10 @@ function cleanup(windowMs: number) {
   if (now - lastCleanup < CLEANUP_INTERVAL) return
   lastCleanup = now
   const cutoff = now - windowMs
-  for (const [key, entry] of store) {
+  store.forEach((entry, key) => {
     entry.timestamps = entry.timestamps.filter(t => t > cutoff)
     if (entry.timestamps.length === 0) store.delete(key)
-  }
+  })
 }
 
 /**
