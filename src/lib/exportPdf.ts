@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf'
 import type { TournamentResult, RegionResult, Matchup, RegionName } from '@/types/bracket'
+import { generateQrMatrix } from './qrcodegen'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Black-and-white bracket PDF — drawn entirely with jsPDF primitives.
@@ -230,6 +231,7 @@ function drawRegion(
 export async function exportBracketPdf(
   result: TournamentResult,
   modelName: string,
+  shareUrl?: string,
 ): Promise<void> {
   const pdf = new jsPDF({
     orientation: 'landscape',
@@ -342,6 +344,44 @@ export async function exportBracketPdf(
   pdf.text('R32', rightX - COL_W + SLOT_W / 2, headerY, { align: 'center' })
   pdf.text('S16', rightX - COL_W * 2 + SLOT_W / 2, headerY, { align: 'center' })
   pdf.text('E8', rightX - COL_W * 3 + SLOT_W / 2, headerY, { align: 'center' })
+
+  // ── QR Code (bottom-right corner) ──
+  if (shareUrl) {
+    const qrSize = 55
+    const qrX = PAGE_W - MARGIN - qrSize
+    const qrY = PAGE_H - MARGIN - qrSize - 10  // 10pt reserved for label below
+    const modules = generateQrMatrix(shareUrl, 'L')
+    const moduleCount = modules.length
+    const padding = 1  // 1-module quiet zone
+    const totalCells = moduleCount + padding * 2
+    const cellSize = qrSize / totalCells
+
+    // White background for quiet zone
+    pdf.setFillColor(255, 255, 255)
+    pdf.rect(qrX, qrY, qrSize, qrSize, 'F')
+
+    // Draw dark modules
+    pdf.setFillColor(0, 0, 0)
+    for (let row = 0; row < moduleCount; row++) {
+      for (let col = 0; col < moduleCount; col++) {
+        if (modules[row][col]) {
+          pdf.rect(
+            qrX + (col + padding) * cellSize,
+            qrY + (row + padding) * cellSize,
+            cellSize,
+            cellSize,
+            'F',
+          )
+        }
+      }
+    }
+
+    // Label below QR
+    pdf.setFont('helvetica', 'normal')
+    pdf.setFontSize(4.5)
+    pdf.setTextColor(120)
+    pdf.text('SCAN TO VIEW BRACKET', qrX + qrSize / 2, qrY + qrSize + 7, { align: 'center' })
+  }
 
   // ── Save ──
   const safeName = modelName.replace(/[^a-zA-Z0-9]+/g, '-').replace(/^-|-$/g, '').toLowerCase() || 'bracket'

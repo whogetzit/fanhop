@@ -124,15 +124,24 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true)
     try {
+      // Build share URL (same logic as handleShare)
+      let shareUrl: string
+      if (activePreset === 'chaos') {
+        const base = typeof window !== 'undefined' ? window.location.origin : ''
+        shareUrl = `${base}/bracket?b=${encodeBracket(result)}&p=chaos`
+      } else {
+        const presetParam = activePreset ? `&p=${activePreset}` : ''
+        shareUrl = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+      }
       const { exportBracketPdf } = await import('@/lib/exportPdf')
-      await exportBracketPdf(result, printName)
+      await exportBracketPdf(result, printName, shareUrl)
     } catch (err) {
       console.error('PDF export failed:', err)
       showToast('PDF export failed')
     } finally {
       setPdfLoading(false)
     }
-  }, [result, printName, showToast])
+  }, [result, printName, weights, modelName, activePreset, showToast])
 
   return (
     <div className="flex flex-col h-screen overflow-hidden">
