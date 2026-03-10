@@ -37,6 +37,9 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [showQR, setShowQR] = useState(false)
   const [qrUrl, setQrUrl] = useState<string | null>(null)
+  const [pdfLoading, setPdfLoading] = useState(false)
+  const [bracketScale, setBracketScale] = useState(1)
+  const canvasRef = useRef<HTMLDivElement>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
 
   useEffect(() => {
@@ -46,6 +49,18 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
       setUser(session?.user ?? null)
     })
     return () => subscription.unsubscribe()
+  }, [])
+
+  // Auto-scale bracket to fit mobile viewports
+  useEffect(() => {
+    const el = canvasRef.current
+    if (!el) return
+    const ro = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width
+      setBracketScale(w < 860 ? w / 880 : 1)
+    })
+    ro.observe(el)
+    return () => ro.disconnect()
   }, [])
 
   const handleWeightsChange = useCallback((next: StatWeights, preset?: string | null) => {
@@ -106,6 +121,19 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     ? PRESET_LABELS[activePreset] ?? activePreset
     : modelName || 'My Bracket'
 
+  const handleDownloadPdf = useCallback(async () => {
+    setPdfLoading(true)
+    try {
+      const { exportBracketPdf } = await import('@/lib/exportPdf')
+      await exportBracketPdf(result, printName)
+    } catch (err) {
+      console.error('PDF export failed:', err)
+      showToast('PDF export failed')
+    } finally {
+      setPdfLoading(false)
+    }
+  }, [result, printName, showToast])
+
   return (
     <div className="flex flex-col h-screen overflow-hidden">
       {/* Header */}
@@ -139,15 +167,16 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             </div>
           </div>
 
-          {/* Print - desktop only */}
+          {/* PDF download - desktop only */}
           <button
-            onClick={() => window.print()}
-            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            onClick={handleDownloadPdf}
+            disabled={pdfLoading}
+            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block disabled:opacity-50"
             style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
-            onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
+            onMouseEnter={e => { if (!pdfLoading) { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' } }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
           >
-            🖨 Print
+            {pdfLoading ? '⏳ Saving…' : '📥 PDF'}
           </button>
 
           {/* Share */}
@@ -161,16 +190,17 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             Share ↗
           </button>
 
-          {/* QR - desktop only */}
+          {/* QR */}
           <button
             onClick={handleQR}
-            className="px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors hidden sm:block"
+            className="px-2 sm:px-3 py-[7px] rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] border transition-colors"
             style={{ borderColor: 'var(--dim)', color: 'var(--muted)' }}
             onMouseEnter={e => { e.currentTarget.style.borderColor = 'var(--orange)'; e.currentTarget.style.color = 'var(--orange)' }}
             onMouseLeave={e => { e.currentTarget.style.borderColor = 'var(--dim)'; e.currentTarget.style.color = 'var(--muted)' }}
             title="Show QR code"
           >
-            ▦ QR
+            <span className="sm:hidden">▦</span>
+            <span className="hidden sm:inline">▦ QR</span>
           </button>
 
           {/* Auth */}
@@ -218,10 +248,17 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
         {/* Bracket canvas */}
         <div
           id="print-area"
+          ref={canvasRef}
           className="flex-1 overflow-auto p-2 sm:p-3"
           style={{ scrollbarWidth: 'thin', ['--model-name' as any]: `"${printName}"` }}
         >
-          <BracketCanvas result={result} />
+          <div style={bracketScale < 1 ? {
+            transform: `scale(${bracketScale})`,
+            transformOrigin: 'top left',
+            width: `${100 / bracketScale}%`,
+          } : undefined}>
+            <BracketCanvas result={result} />
+          </div>
         </div>
 
         {/* Mobile: floating Model button */}
