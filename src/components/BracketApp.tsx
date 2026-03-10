@@ -95,13 +95,13 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   }, [weights, modelName, activePreset, result, showToast])
 
   const handleQR = useCallback(() => {
+    const prodBase = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
     let url: string
     if (activePreset === 'chaos') {
-      const base = typeof window !== 'undefined' ? window.location.origin : ''
-      url = `${base}/bracket?b=${encodeBracket(result)}&p=chaos`
+      url = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos`
     } else {
       const presetParam = activePreset ? `&p=${activePreset}` : ''
-      url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+      url = buildShareUrl({ weights, name: modelName || undefined }, prodBase) + presetParam
     }
     setQrUrl(url)
     setShowQR(true)
