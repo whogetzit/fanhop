@@ -120,14 +120,14 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const handleDownloadPdf = useCallback(async () => {
     setPdfLoading(true)
     try {
-      // Build share URL (same logic as handleShare)
+      // Use production URL for QR code so printed PDFs are scannable
+      const prodBase = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
       let shareUrl: string
       if (activePreset === 'chaos') {
-        const base = typeof window !== 'undefined' ? window.location.origin : ''
-        shareUrl = `${base}/bracket?b=${encodeBracket(result)}&p=chaos`
+        shareUrl = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos`
       } else {
         const presetParam = activePreset ? `&p=${activePreset}` : ''
-        shareUrl = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+        shareUrl = buildShareUrl({ weights, name: modelName || undefined }, prodBase) + presetParam
       }
       const { exportBracketPdf } = await import('@/lib/exportPdf')
       await exportBracketPdf(result, printName, shareUrl)
