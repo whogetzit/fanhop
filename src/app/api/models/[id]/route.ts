@@ -5,6 +5,8 @@ export async function PATCH(req: NextRequest, { params }: { params: { id: string
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   const body = await req.json()
+  if (typeof body.is_public !== 'boolean')
+    return NextResponse.json({ error: 'is_public must be a boolean' }, { status: 400 })
   const { data, error } = await supabase.from('models').update({ is_public: body.is_public, updated_at: new Date().toISOString() } as never).eq('id', params.id).eq('user_id', user.id).select().single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
