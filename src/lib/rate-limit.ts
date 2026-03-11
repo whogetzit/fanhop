@@ -61,7 +61,7 @@ export async function rateLimit(
     // Atomic: insert a new entry and count recent entries in one round-trip
     const { error: insertError } = await supabase
       .from('rate_limits')
-      .insert({ key, created_at: new Date().toISOString() })
+      .insert({ key, created_at: new Date().toISOString() } as any)
 
     if (insertError) {
       // If table doesn't exist yet, fall back to in-memory

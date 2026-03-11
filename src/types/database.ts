@@ -22,8 +22,24 @@ export interface Database {
           champion?:  string | null
         }
         Update: Partial<Database['public']['Tables']['models']['Insert']>
+        Relationships: []
+      }
+      rate_limits: {
+        Row: {
+          id:         number
+          key:        string
+          created_at: string
+        }
+        Insert: {
+          id?:        number
+          key:        string
+          created_at?: string
+        }
+        Update: Partial<Database['public']['Tables']['rate_limits']['Insert']>
+        Relationships: []
       }
     }
     Views: {}
+    Functions: {}
   }
 }

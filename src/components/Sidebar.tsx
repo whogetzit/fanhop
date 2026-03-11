@@ -79,7 +79,7 @@ export default function Sidebar({ weights, modelName, user, activePreset, onWeig
     onWeightsChange(model.weights, null)
     onNameChange(model.name)
     setActiveId(model.id)
-    setActivePreset(null)
+    onPresetChange(null)
     onToast(`Loaded "${model.name}"`)
   }
 
