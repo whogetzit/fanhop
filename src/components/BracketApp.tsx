@@ -66,6 +66,13 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     setResult(simTournament(next, undefined, undefined, preset === 'chaos'))
   }, [])
 
+  const handleLoadModel = useCallback((w: StatWeights, loadedResult: TournamentResult, preset: string | null, name: string) => {
+    setWeights(w)
+    setActivePreset(preset)
+    setModelName(name)
+    setResult(loadedResult)
+  }, [])
+
   const showToast = useCallback((msg: string) => {
     clearTimeout(toastTimer.current)
     setShareToast(msg)
@@ -244,10 +251,12 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
         <div className="hidden sm:block flex-shrink-0">
           <Sidebar
             weights={weights}
+            result={result}
             modelName={modelName}
             user={user}
             activePreset={activePreset}
             onWeightsChange={handleWeightsChange}
+            onLoadModel={handleLoadModel}
             onNameChange={setModelName}
             onNeedAuth={() => setShowAuth(true)}
             onToast={showToast}
@@ -309,10 +318,12 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
               <div className="overflow-y-auto flex-1">
                 <Sidebar
                   weights={weights}
+                  result={result}
                   modelName={modelName}
                   user={user}
                   activePreset={activePreset}
                   onWeightsChange={handleWeightsChange}
+                  onLoadModel={handleLoadModel}
                   onNameChange={setModelName}
                   onNeedAuth={() => { setDrawerOpen(false); setShowAuth(true) }}
                   onToast={(msg) => { setDrawerOpen(false); showToast(msg) }}

@@ -37,17 +37,23 @@ export async function saveModelToCloud(
   name: string,
   weights: Record<string, number>,
   champion: string,
+  bracketData?: string | null,
+  preset?: string | null,
 ) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) throw new Error('Not signed in')
 
+  const row: Record<string, any> = {
+    user_id: user.id, name, weights, champion,
+    year: DEFAULT_YEAR_NUM, updated_at: new Date().toISOString(),
+    bracket_data: bracketData ?? null,
+    preset: preset ?? null,
+  }
+
   const { data, error } = await supabase
     .from('models')
-    .upsert(
-      { user_id: user.id, name, weights, champion, year: DEFAULT_YEAR_NUM, updated_at: new Date().toISOString() },
-      { onConflict: 'user_id,name' }
-    )
+    .upsert(row, { onConflict: 'user_id,name' })
     .select()
     .single()
 
@@ -62,7 +68,7 @@ export async function loadModelsFromCloud(year: number = DEFAULT_YEAR_NUM) {
 
   const { data, error } = await supabase
     .from('models')
-    .select('id, name, champion, weights, updated_at')
+    .select('id, name, champion, weights, updated_at, bracket_data, preset')
     .eq('user_id', user.id)
     .eq('year', year)
     .order('updated_at', { ascending: false })
