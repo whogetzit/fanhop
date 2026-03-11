@@ -31,8 +31,8 @@ export async function middleware(request: NextRequest) {
     }
   )
 
-  // Refresh session — required for Server Components
-  await supabase.auth.getUser()
+  // Refresh session cookie (local check, no network round-trip to Supabase)
+  await supabase.auth.getSession()
 
   return supabaseResponse
 }

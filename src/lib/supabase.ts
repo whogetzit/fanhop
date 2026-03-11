@@ -61,9 +61,10 @@ export async function loadModelsFromCloud() {
 
   const { data, error } = await supabase
     .from('models')
-    .select('*')
+    .select('id, name, champion, weights, updated_at')
     .eq('user_id', user.id)
     .order('updated_at', { ascending: false })
+    .limit(50)
 
   if (error) throw error
   return data ?? []
