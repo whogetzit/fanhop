@@ -1,5 +1,5 @@
 // @ts-nocheck
-// import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ProfileClient from './ProfileClient'
@@ -16,11 +16,21 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 export default async function ProfilePage({ params }: Props) {
   const supabase = await createClient()
 
-  const { data: profile } = await supabase
+  // Try lookup by username first, then fall back to id (profile link uses user.id)
+  let { data: profile } = await supabase
     .from('profiles')
     .select('*')
     .eq('username', params.username)
     .single()
+
+  if (!profile) {
+    const { data: byId } = await supabase
+      .from('profiles')
+      .select('*')
+      .eq('id', params.username)
+      .single()
+    profile = byId
+  }
 
   if (!profile) notFound()
 
