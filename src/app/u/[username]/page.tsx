@@ -71,7 +71,7 @@ export default async function ProfilePage({ params }: Props) {
   if (isOwner) {
     const { data } = await supabase
       .from('models')
-      .select('id, name, champion, weights, is_public, like_count, created_at')
+      .select('id, name, champion, weights, is_public, like_count, created_at, bracket_data, preset')
       .eq('user_id', profile.id)
       .eq('is_public', false)
       .eq('year', DEFAULT_YEAR_NUM)

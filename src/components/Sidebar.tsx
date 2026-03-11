@@ -1,10 +1,10 @@
 'use client'
 
 import { useEffect, useRef, useState, useCallback } from 'react'
-import type { StatWeights } from '@/types/bracket'
+import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { STAT_GROUPS, STAT_LABELS, PRESETS, PRESET_LABELS } from '@/types/bracket'
-import { simTournament } from '@/lib/simulation'
 import { saveModelToCloud, loadModelsFromCloud, deleteModelFromCloud } from '@/lib/supabase'
+import { encodeBracket, decodeBracket } from '@/lib/encoding'
 import type { User } from '@supabase/supabase-js'
 
 interface CloudModel {
@@ -13,14 +13,18 @@ interface CloudModel {
   champion: string | null
   weights: StatWeights
   updated_at: string
+  bracket_data?: string | null
+  preset?: string | null
 }
 
 interface Props {
   weights: StatWeights
+  result: TournamentResult
   modelName: string
   user: User | null
   activePreset: string | null
   onWeightsChange: (w: StatWeights, preset?: string | null) => void
+  onLoadModel: (w: StatWeights, result: TournamentResult, preset: string | null, name: string) => void
   onNameChange: (name: string) => void
   onNeedAuth: () => void
   onToast: (msg: string) => void
@@ -28,7 +32,7 @@ interface Props {
   mobile?: boolean
 }
 
-export default function Sidebar({ weights, modelName, user, activePreset, onWeightsChange, onNameChange, onNeedAuth, onToast, onPresetChange, mobile }: Props) {
+export default function Sidebar({ weights, result, modelName, user, activePreset, onWeightsChange, onLoadModel, onNameChange, onNeedAuth, onToast, onPresetChange, mobile }: Props) {
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
@@ -63,8 +67,8 @@ export default function Sidebar({ weights, modelName, user, activePreset, onWeig
 
     setSaving(true)
     try {
-      const result = simTournament(weights)
-      await saveModelToCloud(name, { ...weights }, result.champion)
+      const bracketData = activePreset === 'chaos' ? encodeBracket(result) : null
+      await saveModelToCloud(name, { ...weights }, result.champion, bracketData, activePreset)
       const models = (await loadModelsFromCloud()) as CloudModel[]
       setSaved(models)
       const saved = models.find(m => m.name === name)
@@ -78,10 +82,22 @@ export default function Sidebar({ weights, modelName, user, activePreset, onWeig
   }
 
   function handleLoad(model: CloudModel) {
-    onWeightsChange(model.weights, null)
+    const preset = model.preset ?? null
+    // If model has a stored bracket (chaos), decode and load it directly
+    if (model.bracket_data) {
+      const decoded = decodeBracket(model.bracket_data)
+      if (decoded) {
+        onLoadModel(model.weights, decoded, preset, model.name)
+        setActiveId(model.id)
+        onToast(`Loaded "${model.name}"`)
+        return
+      }
+    }
+    // Regular model: re-simulate from weights
+    onWeightsChange(model.weights, preset)
     onNameChange(model.name)
     setActiveId(model.id)
-    onPresetChange(null)
+    onPresetChange(preset)
     onToast(`Loaded "${model.name}"`)
   }
 
