@@ -10,27 +10,21 @@ export type TournamentYear = '2013' | '2025'
 
 const MAX_RANK = 350
 
-// ─── Active year data (switchable) ───────────────────────────────────────────
-let activeTeams: Record<string, TeamStats> = TEAMS_2025
-let activeBracket: BracketData = BRACKET_2025
-
-export function setYear(year: TournamentYear) {
-  if (year === '2013') {
-    activeTeams = TEAMS_2013
-    activeBracket = BRACKET_2013
-  } else {
-    activeTeams = TEAMS_2025
-    activeBracket = BRACKET_2025
-  }
+// ─── Year data (immutable, safe for concurrent serverless requests) ──────────
+const YEAR_DATA: Record<TournamentYear, { teams: Record<string, TeamStats>; bracket: BracketData }> = {
+  '2013': { teams: TEAMS_2013, bracket: BRACKET_2013 },
+  '2025': { teams: TEAMS_2025, bracket: BRACKET_2025 },
 }
 
-export function getActiveTeams() { return activeTeams }
-export function getActiveBracket() { return activeBracket }
+const DEFAULT_YEAR: TournamentYear = '2025'
+
+export function getActiveTeams(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].teams }
+export function getActiveBracket(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].bracket }
 
 // ─── Score a single team given current weights ────────────────────────────────
 
 export function scoreTeam(name: string, weights: StatWeights, teams?: Record<string, TeamStats>): number {
-  const t = (teams || activeTeams)[name]
+  const t = (teams || YEAR_DATA[DEFAULT_YEAR].teams)[name]
   if (!t) return 0
   let score = 0
   for (const [stat, w] of Object.entries(weights) as [keyof StatWeights, number][]) {
@@ -87,7 +81,7 @@ const R64_PAIRS: [number, number][] = [
 
 function makeSeedMap(region: RegionName, bracket?: BracketData): Record<string, number> {
   const map: Record<string, number> = {}
-  const b = bracket || activeBracket
+  const b = bracket || YEAR_DATA[DEFAULT_YEAR].bracket
   for (const [seed, team] of Object.entries(b[region])) {
     map[team] = Number(seed)
   }
@@ -95,7 +89,7 @@ function makeSeedMap(region: RegionName, bracket?: BracketData): Record<string, 
 }
 
 export function simRegion(regionName: RegionName, weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>, chaos = false): RegionResult {
-  const b = bracket || activeBracket
+  const b = bracket || YEAR_DATA[DEFAULT_YEAR].bracket
   const seeding = b[regionName]
   const seedMap = makeSeedMap(regionName, b)
 
@@ -127,8 +121,8 @@ export function simRegion(regionName: RegionName, weights: StatWeights, bracket?
 // ─── Simulate the full tournament ────────────────────────────────────────────
 
 export function simTournament(weights: StatWeights, bracket?: BracketData, teams?: Record<string, TeamStats>, chaos = false): TournamentResult {
-  const b = bracket || activeBracket
-  const t = teams || activeTeams
+  const b = bracket || YEAR_DATA[DEFAULT_YEAR].bracket
+  const t = teams || YEAR_DATA[DEFAULT_YEAR].teams
 
   const regions = (['Midwest', 'West', 'East', 'South'] as RegionName[]).reduce(
     (acc, r) => ({ ...acc, [r]: simRegion(r, weights, b, t, chaos) }),
@@ -172,7 +166,7 @@ export function simTournament(weights: StatWeights, bracket?: BracketData, teams
 
 export function getSeed(teamName: string): number {
   for (const region of ['Midwest', 'West', 'East', 'South'] as RegionName[]) {
-    for (const [seed, team] of Object.entries(activeBracket[region])) {
+    for (const [seed, team] of Object.entries(YEAR_DATA[DEFAULT_YEAR].bracket[region])) {
       if (team === teamName) return Number(seed)
     }
   }

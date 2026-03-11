@@ -13,11 +13,23 @@ function isValidWeights(w: unknown): w is Record<string, number> {
   return STAT_KEYS.every(k => typeof obj[k] === 'number' && obj[k] >= 0 && obj[k] <= 10)
 }
 
-export async function GET() {
+const MAX_PAGE_SIZE = 50
+
+export async function GET(req: NextRequest) {
   const supabase = await createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
-  const { data, error } = await supabase.from('models').select('*').eq('user_id', user.id).order('updated_at', { ascending: false })
+
+  const { searchParams } = req.nextUrl
+  const limit = Math.min(Number(searchParams.get('limit')) || MAX_PAGE_SIZE, MAX_PAGE_SIZE)
+  const offset = Math.max(Number(searchParams.get('offset')) || 0, 0)
+
+  const { data, error } = await supabase
+    .from('models')
+    .select('id, name, weights, champion, is_public, created_at, updated_at')
+    .eq('user_id', user.id)
+    .order('updated_at', { ascending: false })
+    .range(offset, offset + limit - 1)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
   return NextResponse.json(data)
 }
@@ -38,13 +50,15 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: 'weights must contain all stat keys with values 0-10' }, { status: 400 })
   if (champion !== undefined && (typeof champion !== 'string' || champion.length > MAX_CHAMPION_LEN))
     return NextResponse.json({ error: 'champion must be a string (max 100 chars)' }, { status: 400 })
-  const { data: existing } = await supabase.from('models').select('id').eq('user_id', user.id).ilike('name', name).single()
-  if (existing) {
-    const { data, error } = await supabase.from('models').update({ weights, champion, updated_at: new Date().toISOString() }).eq('id', existing.id).select().single()
-    if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    return NextResponse.json({ ...data, updated: true })
-  }
-  const { data, error } = await supabase.from('models').insert({ user_id: user.id, name, weights, champion }).select().single()
+  // Atomic upsert — requires UNIQUE(user_id, name) constraint on models table
+  const { data, error } = await supabase
+    .from('models')
+    .upsert(
+      { user_id: user.id, name, weights, champion, updated_at: new Date().toISOString() },
+      { onConflict: 'user_id,name' }
+    )
+    .select()
+    .single()
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json({ ...data, updated: false })
+  return NextResponse.json(data)
 }

@@ -4,8 +4,6 @@ import { simTournament } from '@/lib/simulation'
 import { DEFAULT_WEIGHTS, PRESETS } from '@/types/bracket'
 import BracketApp from '@/components/BracketApp'
 
-export const dynamic = 'force-dynamic'
-
 interface Props {
   searchParams: Record<string, string>
 }

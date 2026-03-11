@@ -13,7 +13,7 @@ export async function GET(req: NextRequest) {
   const result = simTournament(weights)
   const name = model?.name ?? 'My Bracket'
 
-  return new ImageResponse(
+  const response = new ImageResponse(
     (
       <div
         style={{
@@ -88,4 +88,8 @@ export async function GET(req: NextRequest) {
     ),
     { width: 1200, height: 630 }
   )
+
+  // Cache OG images at CDN edge for 24h (deterministic output per URL params)
+  response.headers.set('Cache-Control', 'public, s-maxage=86400, stale-while-revalidate=604800')
+  return response
 }
