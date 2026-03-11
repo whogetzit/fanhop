@@ -59,7 +59,7 @@ export async function rateLimit(
     const windowStart = new Date(Date.now() - windowMs).toISOString()
 
     // Atomic: insert a new entry and count recent entries in one round-trip
-    const { error: insertError } = await supabase
+    const { error: insertError } = await (supabase as any)
       .from('rate_limits')
       .insert({ key, created_at: new Date().toISOString() })
 
@@ -68,7 +68,7 @@ export async function rateLimit(
       return memRateLimit(key, limit, windowMs)
     }
 
-    const { count, error: countError } = await supabase
+    const { count, error: countError } = await (supabase as any)
       .from('rate_limits')
       .select('*', { count: 'exact', head: true })
       .eq('key', key)
