@@ -31,7 +31,9 @@ export async function GET(req: NextRequest) {
     .order('updated_at', { ascending: false })
     .range(offset, offset + limit - 1)
   if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-  return NextResponse.json(data)
+  return NextResponse.json(data, {
+    headers: { 'Cache-Control': 'private, max-age=0, stale-while-revalidate=30' },
+  })
 }
 
 export async function POST(req: NextRequest) {
@@ -39,8 +41,8 @@ export async function POST(req: NextRequest) {
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
 
-  // Rate limit: 20 saves per minute per user
-  const { limited } = rateLimit(`models:${user.id}`, 20, 60_000)
+  // Rate limit: 20 saves per minute per user (distributed across instances)
+  const { limited } = await rateLimit(`models:${user.id}`, 20, 60_000)
   if (limited) return NextResponse.json({ error: 'Too many requests' }, { status: 429 })
 
   const { name, weights, champion } = await req.json()
