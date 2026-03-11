@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
-import { simTournament } from '@/lib/simulation'
+import { simTournament, DEFAULT_YEAR } from '@/lib/simulation'
 import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
@@ -159,7 +159,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
           className="font-barlowc text-[11px] tracking-[2px] uppercase border-l pl-3 sm:pl-5 hidden sm:block"
           style={{ color: 'var(--muted)', borderColor: 'var(--rule)' }}
         >
-          2025 NCAA Tournament · Model Builder
+          {DEFAULT_YEAR} NCAA Tournament · Model Builder
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
