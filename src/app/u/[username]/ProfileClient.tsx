@@ -18,6 +18,7 @@ interface Profile {
   display_name: string | null
   avatar_url: string | null
   bio: string | null
+  created_at: string
 }
 
 interface Props {
@@ -77,6 +78,11 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
               {profile.display_name ?? profile.username}
             </div>
             <div className="text-[13px]" style={{ color: 'var(--muted)' }}>@{profile.username}</div>
+            {profile.created_at && (
+              <div className="text-[11px] mt-1" style={{ color: 'var(--dim)' }}>
+                Member since {new Date(profile.created_at).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </div>
+            )}
             {profile.bio && <div className="text-[13px] mt-1" style={{ color: 'var(--ftext)' }}>{profile.bio}</div>}
           </div>
           <div className="ml-auto text-right">
