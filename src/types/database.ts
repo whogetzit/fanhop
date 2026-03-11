@@ -11,6 +11,8 @@ export interface Database {
           name:       string
           weights:    Record<string, number>
           champion:   string | null
+          is_public:  boolean
+          like_count: number
           created_at: string
           updated_at: string
         }
@@ -20,8 +22,28 @@ export interface Database {
           name:       string
           weights:    Record<string, number>
           champion?:  string | null
+          is_public?: boolean
         }
         Update: Partial<Database['public']['Tables']['models']['Insert']>
+        Relationships: []
+      }
+      profiles: {
+        Row: {
+          id:           string
+          username:     string
+          display_name: string | null
+          avatar_url:   string | null
+          bio:          string | null
+          created_at:   string
+        }
+        Insert: {
+          id:           string
+          username:     string
+          display_name?: string | null
+          avatar_url?:  string | null
+          bio?:         string | null
+        }
+        Update: Partial<Database['public']['Tables']['profiles']['Insert']>
         Relationships: []
       }
       rate_limits: {

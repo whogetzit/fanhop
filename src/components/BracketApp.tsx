@@ -211,7 +211,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
           {/* Auth */}
           {user ? (
             <a
-              href={`/u/${user.id}`}
+              href={`/u/${user.email?.split('@')[0] ?? user.id}`}
               className="w-8 h-8 rounded-full flex items-center justify-center font-barlowc font-bold text-[13px] text-white flex-shrink-0"
               style={{ background: 'var(--orange)' }}
               title={user.email ?? 'Profile'}
