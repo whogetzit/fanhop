@@ -146,8 +146,13 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
         className="flex-shrink-0 flex items-center gap-2 sm:gap-5 px-3 sm:px-5 h-[50px] border-b-2"
         style={{ background: 'var(--navy2)', borderColor: 'var(--orange)' }}
       >
-        <div className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
-          Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+        <div className="flex flex-col leading-none">
+          <div className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
+            Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+          </div>
+          <div className="font-barlowc text-[8px] tracking-[2px] uppercase" style={{ color: 'var(--muted)' }}>
+            Madness, Modeled.
+          </div>
         </div>
 
         <div

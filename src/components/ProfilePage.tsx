@@ -31,8 +31,13 @@ export default function ProfilePage({ models, email, userId }: Props) {
     <div className="min-h-screen" style={{ background: 'var(--navy)' }}>
       {/* Header */}
       <div className="border-b-2 px-6 py-4" style={{ background: 'var(--navy2)', borderColor: 'var(--orange)' }}>
-        <a href="/bracket" className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
-          Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+        <a href="/bracket" className="flex flex-col leading-none">
+          <span className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
+            Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+          </span>
+          <span className="font-barlowc text-[8px] tracking-[2px] uppercase" style={{ color: 'var(--muted)' }}>
+            Madness, Modeled.
+          </span>
         </a>
       </div>
 

@@ -30,8 +30,13 @@ export async function GET(req: NextRequest) {
         }}
       >
         {/* Logo */}
-        <div style={{ display: 'flex', fontSize: '28px', letterSpacing: '4px', color: '#ccd9ea', fontWeight: 700 }}>
-          FAN<span style={{ color: '#f96a1b' }}>HOP</span>
+        <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+          <div style={{ display: 'flex', fontSize: '28px', letterSpacing: '4px', color: '#ccd9ea', fontWeight: 700 }}>
+            FAN<span style={{ color: '#f96a1b' }}>HOP</span>
+          </div>
+          <div style={{ fontSize: '10px', letterSpacing: '3px', color: '#6b88a8', marginTop: '2px' }}>
+            MADNESS, MODELED.
+          </div>
         </div>
 
         {/* Model name */}

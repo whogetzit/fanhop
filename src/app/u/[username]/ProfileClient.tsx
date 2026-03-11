@@ -50,8 +50,13 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
       {/* Header */}
       <div className="border-b" style={{ background: 'var(--navy2)', borderColor: 'var(--orange)' }}>
         <div className="max-w-3xl mx-auto px-6 py-4 flex items-center justify-between">
-          <a href="/bracket" className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
-            Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+          <a href="/bracket" className="flex flex-col leading-none">
+            <span className="font-barlowc font-bold text-2xl tracking-[3px]" style={{ color: 'var(--ftext)' }}>
+              Fan<span style={{ color: 'var(--orange)' }}>Hop</span>
+            </span>
+            <span className="font-barlowc text-[8px] tracking-[2px] uppercase" style={{ color: 'var(--muted)' }}>
+              Madness, Modeled.
+            </span>
           </a>
           <a href="/bracket"
             className="px-4 py-2 rounded font-barlowc font-bold text-[13px] uppercase tracking-[1px] text-white"

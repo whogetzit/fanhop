@@ -247,7 +247,7 @@ export async function exportBracketPdf(
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(FONT_HEADER)
   pdf.setTextColor(120)
-  pdf.text(`fanhop.com  ·  ${modelName}`, PAGE_W / 2, MARGIN + 16, { align: 'center' })
+  pdf.text(`fanhop.com  ·  Madness, Modeled.  ·  ${modelName}`, PAGE_W / 2, MARGIN + 16, { align: 'center' })
 
   // ── Compute region positions ──
   const topY = MARGIN + HEADER_H + 6       // top of upper regions
