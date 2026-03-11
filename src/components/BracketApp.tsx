@@ -41,7 +41,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   useEffect(() => {
     const supabase = createClient()
     if (!supabase) return
-    supabase.auth.getUser().then(({ data }: { data: any }) => setUser(data.user))
+    supabase.auth.getUser().then(({ data }: any) => setUser(data.user))
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_: any, session: any) => {
       setUser(session?.user ?? null)
     })
