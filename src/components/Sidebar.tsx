@@ -36,7 +36,9 @@ export default function Sidebar({ weights, modelName, user, activePreset, onWeig
   // Load models from cloud when user signs in
   useEffect(() => {
     if (user) {
-      loadModelsFromCloud().then(models => setSaved(models as CloudModel[]))
+      loadModelsFromCloud()
+        .then(models => setSaved(models as CloudModel[]))
+        .catch(() => {})
     } else {
       setSaved([])
       setActiveId(null)

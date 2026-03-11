@@ -22,11 +22,13 @@ interface Profile {
 
 interface Props {
   profile: Profile
-  models: Model[]
+  publicModels: Model[]
+  privateModels: Model[]
   isOwner: boolean
 }
 
-export default function ProfileClient({ profile, models, isOwner }: Props) {
+export default function ProfileClient({ profile, publicModels, privateModels, isOwner }: Props) {
+  const models = [...publicModels, ...privateModels]
   const [toast, setToast] = useState<string | null>(null)
 
   function showToast(msg: string) {
@@ -36,7 +38,9 @@ export default function ProfileClient({ profile, models, isOwner }: Props) {
 
   function handleShare(model: Model) {
     const url = buildShareUrl({ weights: model.weights as StatWeights, name: model.name })
-    navigator.clipboard.writeText(url).then(() => showToast('Link copied!'))
+    navigator.clipboard.writeText(url)
+      .then(() => showToast('Link copied!'))
+      .catch(() => showToast('Failed to copy link'))
   }
 
   const initials = (profile.display_name ?? profile.username)[0]?.toUpperCase()
