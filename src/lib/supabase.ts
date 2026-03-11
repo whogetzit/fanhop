@@ -1,6 +1,7 @@
 // @ts-nocheck
 import { createBrowserClient } from '@supabase/ssr'
 import type { Database } from '@/types/database'
+import { DEFAULT_YEAR_NUM } from '@/lib/simulation'
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
 
@@ -44,7 +45,7 @@ export async function saveModelToCloud(
   const { data, error } = await supabase
     .from('models')
     .upsert(
-      { user_id: user.id, name, weights, champion, updated_at: new Date().toISOString() },
+      { user_id: user.id, name, weights, champion, year: DEFAULT_YEAR_NUM, updated_at: new Date().toISOString() },
       { onConflict: 'user_id,name' }
     )
     .select()
@@ -54,7 +55,7 @@ export async function saveModelToCloud(
   return data
 }
 
-export async function loadModelsFromCloud() {
+export async function loadModelsFromCloud(year: number = DEFAULT_YEAR_NUM) {
   const supabase = createClient()
   const { data: { user } } = await supabase.auth.getUser()
   if (!user) return []
@@ -63,6 +64,7 @@ export async function loadModelsFromCloud() {
     .from('models')
     .select('id, name, champion, weights, updated_at')
     .eq('user_id', user.id)
+    .eq('year', year)
     .order('updated_at', { ascending: false })
     .limit(50)
 

@@ -16,7 +16,8 @@ const YEAR_DATA: Record<TournamentYear, { teams: Record<string, TeamStats>; brac
   '2025': { teams: TEAMS_2025, bracket: BRACKET_2025 },
 }
 
-const DEFAULT_YEAR: TournamentYear = '2025'
+export const DEFAULT_YEAR: TournamentYear = '2025'
+export const DEFAULT_YEAR_NUM = parseInt(DEFAULT_YEAR, 10)
 
 export function getActiveTeams(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].teams }
 export function getActiveBracket(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].bracket }

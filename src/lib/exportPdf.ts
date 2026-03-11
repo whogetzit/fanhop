@@ -1,6 +1,7 @@
 import { jsPDF } from 'jspdf'
 import type { TournamentResult, RegionResult, Matchup, RegionName } from '@/types/bracket'
 import { generateQrMatrix } from './qrcodegen'
+import { DEFAULT_YEAR } from '@/lib/simulation'
 
 /* ═══════════════════════════════════════════════════════════════════════════
    Black-and-white bracket PDF — drawn entirely with jsPDF primitives.
@@ -243,7 +244,7 @@ export async function exportBracketPdf(
   pdf.setFont('helvetica', 'bold')
   pdf.setFontSize(10)
   pdf.setTextColor(0)
-  pdf.text('NCAA MEN\'S MARCH MADNESS 2025', PAGE_W / 2, MARGIN + 8, { align: 'center' })
+  pdf.text(`NCAA MEN'S MARCH MADNESS ${DEFAULT_YEAR}`, PAGE_W / 2, MARGIN + 8, { align: 'center' })
   pdf.setFont('helvetica', 'normal')
   pdf.setFontSize(FONT_HEADER)
   pdf.setTextColor(120)

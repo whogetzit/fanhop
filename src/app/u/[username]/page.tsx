@@ -2,6 +2,7 @@
 import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
+import { DEFAULT_YEAR_NUM } from '@/lib/simulation'
 import ProfileClient from './ProfileClient'
 
 interface Props { params: { username: string } }
@@ -58,6 +59,7 @@ export default async function ProfilePage({ params }: Props) {
     .select('*')
     .eq('user_id', profile.id)
     .eq('is_public', true)
+    .eq('year', DEFAULT_YEAR_NUM)
     .order('created_at', { ascending: false })
 
   // Get current user to check if viewing own profile
@@ -72,6 +74,7 @@ export default async function ProfilePage({ params }: Props) {
       .select('id, name, champion, weights, is_public, like_count, created_at')
       .eq('user_id', profile.id)
       .eq('is_public', false)
+      .eq('year', DEFAULT_YEAR_NUM)
       .order('created_at', { ascending: false })
     privateModels = data
   }

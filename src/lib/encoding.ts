@@ -93,10 +93,11 @@ export function validateWeights(w: StatWeights): boolean {
   })
 }
 
-export function buildShareUrl(state: ModelState, baseUrl?: string): string {
+export function buildShareUrl(state: ModelState, baseUrl?: string, year?: string): string {
   const base = baseUrl ?? (typeof window !== 'undefined' ? window.location.origin : '')
   const encoded = encodeModel(state)
-  return `${base}/bracket?m=${encoded}`
+  const yearParam = year ? `&y=${year}` : ''
+  return `${base}/bracket?m=${encoded}${yearParam}`
 }
 
 export function parseModelFromSearchParams(
@@ -139,12 +140,14 @@ export function parseModelFromUrl(url: string): ModelState | null {
 // Then FF1 (Midwest vs West), FF2 (East vs South), Championship = 3 more = 63 total
 
 import type { TournamentResult, RegionName } from '@/types/bracket'
-import { BRACKET } from '@/lib/data/2025'
+import { getActiveBracket, DEFAULT_YEAR } from '@/lib/simulation'
+import type { TournamentYear } from '@/lib/simulation'
 
 const REGIONS: RegionName[] = ['Midwest', 'West', 'East', 'South']
 const R64_PAIRS_ENC: [number, number][] = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]]
 
-export function encodeBracket(result: TournamentResult): string {
+export function encodeBracket(result: TournamentResult, year: TournamentYear = DEFAULT_YEAR): string {
+  const BRACKET = getActiveBracket(year)
   const bits: number[] = []
 
   for (const region of REGIONS) {
@@ -185,9 +188,10 @@ export function encodeBracket(result: TournamentResult): string {
   return 'b1:' + toBase64url(bytes)
 }
 
-export function decodeBracket(encoded: string): TournamentResult | null {
+export function decodeBracket(encoded: string, year: TournamentYear = DEFAULT_YEAR): TournamentResult | null {
   try {
     if (!encoded.startsWith('b1:')) return null
+    const BRACKET = getActiveBracket(year)
     const bytes = fromBase64url(encoded.slice(3))
     if (bytes.length < 8) return null
 
