@@ -32,6 +32,25 @@ export default async function ProfilePage({ params }: Props) {
     profile = byId
   }
 
+  // If no profile exists but the param looks like a user ID, create a stub profile
+  if (!profile) {
+    const { data: { user: authUser } } = await supabase.auth.getUser()
+    if (authUser && authUser.id === params.username) {
+      // Auto-create a profile for the signed-in user
+      const username = authUser.email?.split('@')[0] ?? authUser.id.slice(0, 8)
+      const { data: newProfile } = await supabase
+        .from('profiles')
+        .upsert({
+          id: authUser.id,
+          username,
+          display_name: authUser.user_metadata?.full_name ?? username,
+        })
+        .select('*')
+        .single()
+      profile = newProfile
+    }
+  }
+
   if (!profile) notFound()
 
   const { data: models } = await supabase
