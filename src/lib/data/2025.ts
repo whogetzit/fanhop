@@ -6,7 +6,7 @@ import type { TeamStats, BracketData } from '@/types/bracket'
 // Defensive stats (opp_ppg, opp_fg_pct) also rank lower = better defense
 
 export const TEAMS: Record<string, TeamStats> = {
-  // SOUTH REGION (1-Auburn, 2-St. John's, 3-Iowa State, 4-Texas A&M)
+  // SOUTH REGION (1-Auburn, 2-Michigan St., 3-Iowa State, 4-Texas A&M)
   "Auburn":         { name:"Auburn",         region:"South",   conference:"SEC",        win_pct:4,   ppg:15,  opp_ppg:20,  scr_mar:5,   fg_pct:22,  opp_fg_pct:18, three_pg:55,  ft_pct:100, reb_mar:8,   apg:38,  ast_to:32,  bkpg:28,  stpg:14,  topg:88,  opp_topg:42,  rpi:1,   conf_strength:1  },
   "Alabama St.":    { name:"Alabama St.",    region:"South",   conference:"SWAC",       win_pct:130, ppg:210, opp_ppg:205, scr_mar:165, fg_pct:220, opp_fg_pct:200,three_pg:185, ft_pct:230, reb_mar:158, apg:225, ast_to:210, bkpg:205, stpg:195, topg:212, opp_topg:228, rpi:228, conf_strength:12 },
   "Louisville":     { name:"Louisville",     region:"South",   conference:"ACC",        win_pct:48,  ppg:88,  opp_ppg:90,  scr_mar:72,  fg_pct:100, opp_fg_pct:88, three_pg:118, ft_pct:98,  reb_mar:68,  apg:108, ast_to:98,  bkpg:88,  stpg:82,  topg:112, opp_topg:98,  rpi:28,  conf_strength:4  },
@@ -21,7 +21,7 @@ export const TEAMS: Record<string, TeamStats> = {
   "Lipscomb":       { name:"Lipscomb",       region:"South",   conference:"ASUN",       win_pct:78,  ppg:162, opp_ppg:158, scr_mar:142, fg_pct:168, opp_fg_pct:162,three_pg:152, ft_pct:158, reb_mar:138, apg:162, ast_to:158, bkpg:172, stpg:162, topg:168, opp_topg:172, rpi:112, conf_strength:12 },
   "Kansas":         { name:"Kansas",         region:"South",   conference:"Big 12",     win_pct:40,  ppg:58,  opp_ppg:72,  scr_mar:56,  fg_pct:62,  opp_fg_pct:58, three_pg:78,  ft_pct:68,  reb_mar:58,  apg:68,  ast_to:62,  bkpg:68,  stpg:58,  topg:78,  opp_topg:68,  rpi:19,  conf_strength:2  },
   "Akron":          { name:"Akron",          region:"South",   conference:"MAC",        win_pct:56,  ppg:98,  opp_ppg:92,  scr_mar:82,  fg_pct:92,  opp_fg_pct:88, three_pg:82,  ft_pct:102, reb_mar:88,  apg:98,  ast_to:92,  bkpg:108, stpg:102, topg:108, opp_topg:118, rpi:68,  conf_strength:10 },
-  "St. John's":     { name:"St. John's",     region:"South",   conference:"Big East",   win_pct:12,  ppg:28,  opp_ppg:38,  scr_mar:22,  fg_pct:28,  opp_fg_pct:32, three_pg:42,  ft_pct:38,  reb_mar:28,  apg:28,  ast_to:26,  bkpg:38,  stpg:32,  topg:38,  opp_topg:38,  rpi:7,   conf_strength:3  },
+  "Michigan St.":   { name:"Michigan St.",   region:"South",   conference:"Big Ten",    win_pct:10,  ppg:22,  opp_ppg:12,  scr_mar:12,  fg_pct:32,  opp_fg_pct:8,  three_pg:92,  ft_pct:4,   reb_mar:8,   apg:7,   ast_to:38,  bkpg:3,   stpg:10,  topg:90,  opp_topg:35,  rpi:6,   conf_strength:2  },
   "Wofford":        { name:"Wofford",        region:"South",   conference:"SoCon",      win_pct:95,  ppg:175, opp_ppg:168, scr_mar:148, fg_pct:178, opp_fg_pct:172,three_pg:165, ft_pct:170, reb_mar:145, apg:168, ast_to:162, bkpg:175, stpg:168, topg:175, opp_topg:180, rpi:122, conf_strength:12 },
 
   // EAST REGION (1-Duke, 2-Alabama, 3-Wisconsin, 4-Arizona)
@@ -60,7 +60,7 @@ export const TEAMS: Record<string, TeamStats> = {
   "Tennessee":      { name:"Tennessee",      region:"Midwest", conference:"SEC",        win_pct:15,  ppg:32,  opp_ppg:18,  scr_mar:10,  fg_pct:32,  opp_fg_pct:13, three_pg:52,  ft_pct:52,  reb_mar:18,  apg:35,  ast_to:32,  bkpg:35,  stpg:30,  topg:45,  opp_topg:32,  rpi:5,   conf_strength:1  },
   "Wofford-MW":     { name:"Wofford",        region:"Midwest", conference:"SoCon",      win_pct:95,  ppg:175, opp_ppg:168, scr_mar:148, fg_pct:178, opp_fg_pct:172,three_pg:165, ft_pct:170, reb_mar:145, apg:168, ast_to:162, bkpg:175, stpg:168, topg:175, opp_topg:180, rpi:122, conf_strength:12 },
 
-  // WEST REGION (1-Florida, 2-St. John's-W, 3-Texas Tech, 4-Maryland)
+  // WEST REGION (1-Florida, 2-St. John's, 3-Texas Tech, 4-Maryland)
   "Florida":        { name:"Florida",        region:"West",    conference:"SEC",        win_pct:5,   ppg:18,  opp_ppg:25,  scr_mar:7,   fg_pct:18,  opp_fg_pct:20, three_pg:40,  ft_pct:35,  reb_mar:15,  apg:22,  ast_to:20,  bkpg:28,  stpg:20,  topg:32,  opp_topg:30,  rpi:4,   conf_strength:1  },
   "Norfolk St.":    { name:"Norfolk St.",    region:"West",    conference:"MEAC",       win_pct:110, ppg:202, opp_ppg:195, scr_mar:160, fg_pct:205, opp_fg_pct:198,three_pg:182, ft_pct:205, reb_mar:155, apg:205, ast_to:195, bkpg:202, stpg:192, topg:205, opp_topg:212, rpi:212, conf_strength:12 },
   "UConn":          { name:"UConn",          region:"West",    conference:"Big East",   win_pct:28,  ppg:42,  opp_ppg:48,  scr_mar:32,  fg_pct:42,  opp_fg_pct:42, three_pg:58,  ft_pct:48,  reb_mar:38,  apg:42,  ast_to:40,  bkpg:48,  stpg:42,  topg:52,  opp_topg:48,  rpi:15,  conf_strength:3  },
@@ -75,7 +75,7 @@ export const TEAMS: Record<string, TeamStats> = {
   "Arkansas":       { name:"Arkansas",       region:"West",    conference:"SEC",        win_pct:70,  ppg:92,  opp_ppg:98,  scr_mar:80,  fg_pct:98,  opp_fg_pct:92, three_pg:102, ft_pct:108, reb_mar:85,  apg:105, ast_to:100, bkpg:105, stpg:100, topg:115, opp_topg:110, rpi:52,  conf_strength:1  },
   "Texas Tech":     { name:"Texas Tech",     region:"West",    conference:"Big 12",     win_pct:25,  ppg:42,  opp_ppg:35,  scr_mar:28,  fg_pct:42,  opp_fg_pct:30, three_pg:60,  ft_pct:52,  reb_mar:25,  apg:45,  ast_to:42,  bkpg:45,  stpg:40,  topg:55,  opp_topg:42,  rpi:9,   conf_strength:2  },
   "UNCW-W":         { name:"UNCW",           region:"West",    conference:"CAA",        win_pct:80,  ppg:158, opp_ppg:152, scr_mar:135, fg_pct:160, opp_fg_pct:155,three_pg:150, ft_pct:155, reb_mar:132, apg:155, ast_to:150, bkpg:160, stpg:155, topg:160, opp_topg:165, rpi:110, conf_strength:12 },
-  "St. John's-W":   { name:"St. John's",     region:"West",    conference:"Big East",   win_pct:12,  ppg:28,  opp_ppg:38,  scr_mar:22,  fg_pct:28,  opp_fg_pct:32, three_pg:42,  ft_pct:38,  reb_mar:28,  apg:28,  ast_to:26,  bkpg:38,  stpg:32,  topg:38,  opp_topg:38,  rpi:7,   conf_strength:3  },
+  "St. John's":     { name:"St. John's",     region:"West",    conference:"Big East",   win_pct:12,  ppg:28,  opp_ppg:38,  scr_mar:22,  fg_pct:28,  opp_fg_pct:32, three_pg:42,  ft_pct:38,  reb_mar:28,  apg:28,  ast_to:26,  bkpg:38,  stpg:32,  topg:38,  opp_topg:38,  rpi:7,   conf_strength:3  },
   "Omaha":          { name:"Omaha",          region:"West",    conference:"Summit",     win_pct:98,  ppg:182, opp_ppg:178, scr_mar:155, fg_pct:185, opp_fg_pct:180,three_pg:172, ft_pct:180, reb_mar:155, apg:180, ast_to:175, bkpg:185, stpg:178, topg:185, opp_topg:190, rpi:132, conf_strength:12 },
 }
 
@@ -100,7 +100,7 @@ export const BRACKET: BracketData = {
     14: "Lipscomb",
     7:  "Kansas",
     10: "Akron",
-    2:  "St. John's",
+    2:  "Michigan St.",
     15: "Wofford",
   },
   East: {
@@ -163,9 +163,9 @@ export const BRACKET: BracketData = {
 // Each round: winner per matchup in bracket order
 export const RESULTS_2025 = {
   South: {
-    r64:  ["Auburn","Louisville","Michigan","Texas A&M","North Carolina","Iowa State","Kansas","St. John's"],
-    r32:  ["Auburn","Texas A&M","Iowa State","St. John's"],
-    s16:  ["Auburn","St. John's"],
+    r64:  ["Auburn","Louisville","Michigan","Texas A&M","North Carolina","Iowa State","Kansas","Michigan St."],
+    r32:  ["Auburn","Texas A&M","Iowa State","Michigan St."],
+    s16:  ["Auburn","Michigan St."],
     e8:   "Auburn",
   },
   East: {
