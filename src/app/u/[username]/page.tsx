@@ -1,5 +1,5 @@
 // @ts-nocheck
-// import { createClient } from '@/lib/supabase-server'
+import { createClient } from '@/lib/supabase-server'
 import { notFound } from 'next/navigation'
 import type { Metadata } from 'next'
 import ProfileClient from './ProfileClient'
