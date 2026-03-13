@@ -66,7 +66,7 @@ export default function UserMenu() {
         style={{ borderColor: showMenu ? 'var(--orange)' : 'var(--rule)', background: 'var(--navy3)' }}
       >
         {avatarUrl ? (
-          <img src={avatarUrl} alt="" className="w-6 h-6 rounded-full" />
+          <img src={avatarUrl} alt={`${username}'s avatar`} className="w-6 h-6 rounded-full" />
         ) : (
           <div
             className="w-6 h-6 rounded-full flex items-center justify-center font-barlowc font-bold text-[11px]"
