@@ -52,7 +52,7 @@ export default function AuthModal({ onClose }: Props) {
               Save your brackets to the cloud
             </div>
           </div>
-          <button onClick={onClose} className="text-xl leading-none" style={{ color: 'var(--dim)' }}>×</button>
+          <button onClick={onClose} className="text-xl leading-none" style={{ color: 'var(--dim)' }} aria-label="Close sign in dialog">×</button>
         </div>
 
         {sent ? (

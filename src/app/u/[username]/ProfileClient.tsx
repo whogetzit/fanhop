@@ -66,7 +66,7 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
         {/* Profile card */}
         <div className="flex items-center gap-5 mb-8">
           {profile.avatar_url ? (
-            <img src={profile.avatar_url} alt="" className="w-16 h-16 rounded-full border-2" style={{ borderColor: 'var(--orange)' }} />
+            <img src={profile.avatar_url} alt={`${profile.display_name ?? profile.username}'s avatar`} className="w-16 h-16 rounded-full border-2" style={{ borderColor: 'var(--orange)' }} />
           ) : (
             <div className="w-16 h-16 rounded-full flex items-center justify-center font-barlowc font-bold text-2xl border-2"
               style={{ background: 'var(--orange)', color: 'white', borderColor: 'var(--orange)' }}>
