@@ -5,8 +5,9 @@ import type {
 } from '@/types/bracket'
 import { TEAMS as TEAMS_2013, BRACKET as BRACKET_2013 } from '@/lib/data/2013'
 import { TEAMS as TEAMS_2025, BRACKET as BRACKET_2025 } from '@/lib/data/2025'
+import { TEAMS as TEAMS_2026, BRACKET as BRACKET_2026 } from '@/lib/data/2026'
 
-export type TournamentYear = '2013' | '2025'
+export type TournamentYear = '2013' | '2025' | '2026'
 
 const MAX_RANK = 350
 
@@ -14,9 +15,10 @@ const MAX_RANK = 350
 const YEAR_DATA: Record<TournamentYear, { teams: Record<string, TeamStats>; bracket: BracketData }> = {
   '2013': { teams: TEAMS_2013, bracket: BRACKET_2013 },
   '2025': { teams: TEAMS_2025, bracket: BRACKET_2025 },
+  '2026': { teams: TEAMS_2026, bracket: BRACKET_2026 },
 }
 
-export const DEFAULT_YEAR: TournamentYear = '2025'
+export const DEFAULT_YEAR: TournamentYear = '2026'
 export const DEFAULT_YEAR_NUM = parseInt(DEFAULT_YEAR, 10)
 
 export function getActiveTeams(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].teams }
