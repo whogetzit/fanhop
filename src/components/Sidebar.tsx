@@ -118,7 +118,7 @@ export default function Sidebar({ weights, result, modelName, user, activePreset
 
   return (
     <aside
-      className="flex flex-col flex-shrink-0 overflow-hidden border-r"
+      className="flex flex-col flex-shrink-0 overflow-y-auto border-r"
       style={{ width: mobile ? '100%' : 260, background: 'var(--navy2)', borderColor: 'var(--rule)' }}
     >
       {/* Title */}
