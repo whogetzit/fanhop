@@ -3,6 +3,7 @@
 
 import { useState } from 'react'
 import { buildShareUrl } from '@/lib/encoding'
+import { createClient } from '@/lib/supabase'
 import type { StatWeights } from '@/types/bracket'
 
 interface Model {
@@ -14,10 +15,12 @@ interface Model {
 }
 
 interface Profile {
+  id: string
   username: string
   display_name: string | null
   avatar_url: string | null
   bio: string | null
+  email_opt_in: boolean
   created_at: string
 }
 
@@ -31,10 +34,30 @@ interface Props {
 export default function ProfileClient({ profile, publicModels, privateModels, isOwner }: Props) {
   const models = [...publicModels, ...privateModels]
   const [toast, setToast] = useState<string | null>(null)
+  const [emailOptIn, setEmailOptIn] = useState(profile.email_opt_in ?? false)
+  const [saving, setSaving] = useState(false)
 
   function showToast(msg: string) {
     setToast(msg)
     setTimeout(() => setToast(null), 2000)
+  }
+
+  async function handleEmailOptIn(checked: boolean) {
+    setSaving(true)
+    try {
+      const supabase = createClient()
+      const { error } = await supabase
+        .from('profiles')
+        .update({ email_opt_in: checked })
+        .eq('id', profile.id)
+      if (error) throw error
+      setEmailOptIn(checked)
+      showToast('Preferences saved!')
+    } catch {
+      showToast('Failed to save preference')
+    } finally {
+      setSaving(false)
+    }
   }
 
   function handleShare(model: Model) {
@@ -94,6 +117,29 @@ export default function ProfileClient({ profile, publicModels, privateModels, is
             </div>
           </div>
         </div>
+
+        {/* Email preferences (owner only) */}
+        {isOwner && (
+          <div className="rounded-xl border p-4 mb-8 flex items-center justify-between"
+            style={{ background: 'var(--navy2)', borderColor: 'var(--rule)' }}>
+            <label htmlFor="email-opt-in" className="font-barlowc text-[14px] cursor-pointer select-none" style={{ color: 'var(--ftext)' }}>
+              📧 Email me product updates &amp; announcements
+            </label>
+            <button
+              id="email-opt-in"
+              role="switch"
+              aria-checked={emailOptIn}
+              disabled={saving}
+              onClick={() => handleEmailOptIn(!emailOptIn)}
+              className="relative w-11 h-6 rounded-full transition-colors flex-shrink-0"
+              style={{ background: emailOptIn ? 'var(--orange)' : 'var(--dim)', opacity: saving ? 0.5 : 1 }}>
+              <span
+                className="absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white transition-transform"
+                style={{ transform: emailOptIn ? 'translateX(20px)' : 'translateX(0)' }}
+              />
+            </button>
+          </div>
+        )}
 
         {/* Models list */}
         {models.length === 0 ? (
