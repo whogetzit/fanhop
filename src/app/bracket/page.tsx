@@ -11,7 +11,7 @@ interface Props {
 
 function getYear(searchParams: Record<string, string>): TournamentYear {
   const y = searchParams['y']
-  if (y === '2013' || y === '2025') return y
+  if (y === '2013' || y === '2025' || y === '2026') return y
   return DEFAULT_YEAR
 }
 
@@ -58,6 +58,7 @@ export default function BracketPage({ searchParams }: Props) {
       initialName={model?.name}
       initialPreset={preset}
       initialResult={bracketResult ?? undefined}
+      year={year}
     />
   )
 }
