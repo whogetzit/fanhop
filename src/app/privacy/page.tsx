@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       </Link>
 
       <h1 className="font-barlowc font-bold text-3xl mb-6">Privacy Policy</h1>
-      <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>Last updated: March 11, 2026</p>
+      <p className="text-sm mb-4" style={{ color: 'var(--muted)' }}>Last updated: March 13, 2026</p>
 
       <section className="space-y-6 text-sm leading-relaxed" style={{ color: 'var(--ftext)' }}>
         <div>
@@ -56,6 +56,86 @@ export default function PrivacyPage() {
           <p>
             We take reasonable measures to protect your information. However, no method of transmission over
             the Internet is completely secure, and we cannot guarantee absolute security.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">Data Retention</h2>
+          <p>
+            We retain your account information and bracket data for as long as your account is active.
+            If you delete your account, we will remove your personal information and bracket data within
+            30 days, except where we are required to retain it for legal or regulatory purposes. Anonymous,
+            aggregated data that cannot identify you may be retained indefinitely.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">Children&apos;s Privacy</h2>
+          <p>
+            FanHop is not directed at children under the age of 13. We do not knowingly collect personal
+            information from children under 13. If we become aware that we have collected personal
+            information from a child under 13, we will take steps to delete that information promptly.
+            If you believe a child under 13 has provided us with personal information, please contact us
+            at{' '}
+            <a href="mailto:hello@fanhop.com" className="underline" style={{ color: 'var(--orange)' }}>
+              hello@fanhop.com
+            </a>.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">Third-Party Services</h2>
+          <p>
+            FanHop uses third-party services to operate, including Supabase (authentication and database),
+            Vercel (hosting and deployment), and Sports Reference (team statistics data). These services
+            may collect and process data in accordance with their own privacy policies. We encourage you
+            to review the privacy policies of these third-party providers.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">Your Rights</h2>
+          <p>
+            You have the right to access, correct, or delete your personal information at any time. You
+            may also request a copy of the data we hold about you. To exercise any of these rights,
+            please contact us at{' '}
+            <a href="mailto:hello@fanhop.com" className="underline" style={{ color: 'var(--orange)' }}>
+              hello@fanhop.com
+            </a>. We will respond to your request within 30 days.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">California Privacy Rights (CCPA)</h2>
+          <p>
+            If you are a California resident, you have additional rights under the California Consumer
+            Privacy Act (CCPA). These include the right to know what personal information we collect, the
+            right to request deletion of your data, and the right to opt out of the sale of your personal
+            information. We do not sell your personal information. To exercise your California privacy
+            rights, contact us at{' '}
+            <a href="mailto:hello@fanhop.com" className="underline" style={{ color: 'var(--orange)' }}>
+              hello@fanhop.com
+            </a>.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">Do Not Track</h2>
+          <p>
+            Some browsers offer a &quot;Do Not Track&quot; (DNT) signal. FanHop currently does not respond
+            to DNT signals, as there is no industry-wide standard for how to handle them. We will update
+            this policy if a standard is established.
+          </p>
+        </div>
+
+        <div>
+          <h2 className="font-barlowc font-bold text-lg mb-2">International Users</h2>
+          <p>
+            FanHop is operated from the United States. If you are accessing FanHop from outside the
+            United States, please be aware that your information may be transferred to, stored, and
+            processed in the United States where our servers are located. By using FanHop, you consent
+            to the transfer of your information to the United States, which may have different data
+            protection laws than your country of residence.
           </p>
         </div>
 
