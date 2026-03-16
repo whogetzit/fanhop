@@ -5,6 +5,7 @@ import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { STAT_GROUPS, STAT_LABELS, PRESETS, PRESET_LABELS } from '@/types/bracket'
 import { saveModelToCloud, loadModelsFromCloud, deleteModelFromCloud } from '@/lib/supabase'
 import { encodeBracket, decodeBracket } from '@/lib/encoding'
+import { useAnalytics } from '@/hooks/useAnalytics'
 import type { User } from '@supabase/supabase-js'
 
 interface CloudModel {
@@ -36,6 +37,7 @@ export default function Sidebar({ weights, result, modelName, user, activePreset
   const [saved, setSaved] = useState<CloudModel[]>([])
   const [activeId, setActiveId] = useState<string | null>(null)
   const [saving, setSaving] = useState(false)
+  const { uniqueVisitors, modelsCreated } = useAnalytics()
 
   // Load models from cloud when user signs in
   useEffect(() => {
@@ -278,6 +280,15 @@ export default function Sidebar({ weights, result, modelName, user, activePreset
           </div>
         )}
       </div>
+
+      {/* Live analytics */}
+      {(uniqueVisitors > 0 || modelsCreated > 0) && (
+        <div className="flex-shrink-0 px-4 py-2 border-t flex justify-around text-[10px]" style={{ borderColor: 'var(--rule)', color: 'var(--dim)' }}>
+          <span>{uniqueVisitors.toLocaleString()} fans served</span>
+          <span style={{ opacity: 0.4 }}>·</span>
+          <span>{modelsCreated.toLocaleString()} models created</span>
+        </div>
+      )}
 
       {/* Footer */}
       <div className="flex-shrink-0 px-4 py-3 border-t text-[10px] leading-relaxed space-y-1" style={{ borderColor: 'var(--rule)', color: 'var(--dim)' }}>
