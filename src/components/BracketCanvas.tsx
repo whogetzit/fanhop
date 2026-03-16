@@ -24,7 +24,7 @@ export default function BracketCanvas({ result }: Props) {
       }}
     >
       {/* ── Column headers ── */}
-      <Rh cls="midwest" col={1}>MIDWEST</Rh>
+      <Rh cls="east" col={1}>EAST</Rh>
       <Rh col={2}>R32</Rh>
       <Rh col={3}>S16</Rh>
       <Rh col={4}>E8</Rh>
@@ -32,13 +32,13 @@ export default function BracketCanvas({ result }: Props) {
       <Rh col={6}>E8</Rh>
       <Rh col={7}>S16</Rh>
       <Rh col={8}>R32</Rh>
-      <Rh cls="east" col={9}>EAST</Rh>
+      <Rh cls="west" col={9}>WEST</Rh>
 
-      {/* ── Top half: Midwest (left) + East (right) ── */}
-      <RegionLeft  result={regions.Midwest} regionName="Midwest" col={1} row={2} />
-      <RegionLeft  result={regions.Midwest} regionName="Midwest" col={2} row={2} round="r32" />
-      <RegionLeft  result={regions.Midwest} regionName="Midwest" col={3} row={2} round="s16" />
-      <RegionLeft  result={regions.Midwest} regionName="Midwest" col={4} row={2} round="e8" />
+      {/* ── Top half: East (left) + West (right) ── */}
+      <RegionLeft  result={regions.East} regionName="East" col={1} row={2} />
+      <RegionLeft  result={regions.East} regionName="East" col={2} row={2} round="r32" />
+      <RegionLeft  result={regions.East} regionName="East" col={3} row={2} round="s16" />
+      <RegionLeft  result={regions.East} regionName="East" col={4} row={2} round="e8" />
 
       {/* Center: Final Four + Champion */}
       <div
@@ -48,9 +48,9 @@ export default function BracketCanvas({ result }: Props) {
         <div className="font-barlowc text-[9px] uppercase tracking-[2px] mb-1" style={{ color: 'var(--muted)' }}>
           Final Four
         </div>
-        <TeamSlot name={ff1.winner} seed={getSeed(ff1.winner)} win cls="final-four" />
-        <div className="font-barlowc text-[9px] tracking-[1px]" style={{ color: 'var(--dim)' }}>vs</div>
         <TeamSlot name={ff2.winner} seed={getSeed(ff2.winner)} win cls="final-four" />
+        <div className="font-barlowc text-[9px] tracking-[1px]" style={{ color: 'var(--dim)' }}>vs</div>
+        <TeamSlot name={ff1.winner} seed={getSeed(ff1.winner)} win cls="final-four" />
         <div className="font-barlowc text-[9px] uppercase tracking-[2px] mt-2 mb-1" style={{ color: 'var(--muted)' }}>
           Champion
         </div>
@@ -58,26 +58,26 @@ export default function BracketCanvas({ result }: Props) {
         <div className="text-xl mt-1" style={{ filter: 'drop-shadow(0 0 8px rgba(249,106,27,.9))' }}>🏆</div>
       </div>
 
-      <RegionRight result={regions.East}  regionName="East"  col={6} row={2} round="e8" />
-      <RegionRight result={regions.East}  regionName="East"  col={7} row={2} round="s16" />
-      <RegionRight result={regions.East}  regionName="East"  col={8} row={2} round="r32" />
-      <RegionRight result={regions.East}  regionName="East"  col={9} row={2} />
+      <RegionRight result={regions.West}  regionName="West"  col={6} row={2} round="e8" />
+      <RegionRight result={regions.West}  regionName="West"  col={7} row={2} round="s16" />
+      <RegionRight result={regions.West}  regionName="West"  col={8} row={2} round="r32" />
+      <RegionRight result={regions.West}  regionName="West"  col={9} row={2} />
 
       {/* ── Mid dividers ── */}
-      <MidLabel col={1} label="WEST" cls="midwest" />
+      <MidLabel col={1} label="SOUTH" cls="south" />
       {[2,3,4,6,7,8].map(c => <MidDiv key={c} col={c} />)}
-      <MidLabel col={9} label="SOUTH" cls="south" right />
+      <MidLabel col={9} label="MIDWEST" cls="midwest" right />
 
-      {/* ── Bottom half: West (left) + South (right) ── */}
-      <RegionLeft  result={regions.West}  regionName="West"  col={1} row={4} />
-      <RegionLeft  result={regions.West}  regionName="West"  col={2} row={4} round="r32" />
-      <RegionLeft  result={regions.West}  regionName="West"  col={3} row={4} round="s16" />
-      <RegionLeft  result={regions.West}  regionName="West"  col={4} row={4} round="e8" />
+      {/* ── Bottom half: South (left) + Midwest (right) ── */}
+      <RegionLeft  result={regions.South}   regionName="South"   col={1} row={4} />
+      <RegionLeft  result={regions.South}   regionName="South"   col={2} row={4} round="r32" />
+      <RegionLeft  result={regions.South}   regionName="South"   col={3} row={4} round="s16" />
+      <RegionLeft  result={regions.South}   regionName="South"   col={4} row={4} round="e8" />
 
-      <RegionRight result={regions.South} regionName="South" col={6} row={4} round="e8" />
-      <RegionRight result={regions.South} regionName="South" col={7} row={4} round="s16" />
-      <RegionRight result={regions.South} regionName="South" col={8} row={4} round="r32" />
-      <RegionRight result={regions.South} regionName="South" col={9} row={4} />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={6} row={4} round="e8" />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={7} row={4} round="s16" />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={8} row={4} round="r32" />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={9} row={4} />
     </div>
   )
 }
@@ -85,8 +85,8 @@ export default function BracketCanvas({ result }: Props) {
 // ─── Column header ────────────────────────────────────────────────────────────
 
 function Rh({ col, cls, children }: { col: number; cls?: string; children: React.ReactNode }) {
-  const color = cls === 'midwest' || cls === 'west' ? '#ff8060'
-    : cls === 'east' || cls === 'south' ? (cls === 'east' ? '#60d090' : '#c080ff')
+  const color = cls === 'east' || cls === 'south' ? '#ff8060'
+    : cls === 'west' || cls === 'midwest' ? (cls === 'west' ? '#60d090' : '#c080ff')
     : cls === 'ff' ? 'var(--orange)'
     : 'var(--muted)'
   return (
@@ -106,7 +106,7 @@ function MidDiv({ col }: { col: number }) {
 }
 
 function MidLabel({ col, label, cls, right }: { col: number; label: string; cls: string; right?: boolean }) {
-  const color = cls === 'midwest' ? '#ff8060' : '#c080ff'
+  const color = cls === 'south' ? '#ff8060' : '#c080ff'
   return (
     <div
       className="font-barlowc font-semibold text-[9px] uppercase tracking-[2px] border-t pt-1"
