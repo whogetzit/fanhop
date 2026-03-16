@@ -58,6 +58,7 @@ export default function BracketPage({ searchParams }: Props) {
       initialName={model?.name}
       initialPreset={preset}
       initialResult={bracketResult ?? undefined}
+      year={year}
     />
   )
 }

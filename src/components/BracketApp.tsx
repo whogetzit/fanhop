@@ -3,7 +3,8 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
-import { simTournament, DEFAULT_YEAR } from '@/lib/simulation'
+import { simTournament, getActiveBracket, getActiveTeams, DEFAULT_YEAR } from '@/lib/simulation'
+import type { TournamentYear } from '@/lib/simulation'
 import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
 import { createClient, signOut } from '@/lib/supabase'
 import Sidebar from './Sidebar'
@@ -17,14 +18,15 @@ interface Props {
   initialName?: string
   initialPreset?: string
   initialResult?: TournamentResult
+  year?: TournamentYear
 }
 
-export default function BracketApp({ initialWeights, initialName, initialPreset, initialResult }: Props) {
+export default function BracketApp({ initialWeights, initialName, initialPreset, initialResult, year = DEFAULT_YEAR }: Props) {
   const [weights, setWeights] = useState<StatWeights>(initialWeights)
   const [modelName, setModelName] = useState(initialName ?? '')
   const [result, setResult] = useState<TournamentResult>(() => {
     if (initialResult) return initialResult
-    return simTournament(initialWeights, undefined, undefined, initialPreset === 'chaos')
+    return simTournament(initialWeights, getActiveBracket(year), getActiveTeams(year), initialPreset === 'chaos')
   })
   const [shareToast, setShareToast] = useState<string | null>(null)
   const [showAuth, setShowAuth] = useState(false)
@@ -63,7 +65,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const handleWeightsChange = useCallback((next: StatWeights, preset?: string | null) => {
     setWeights(next)
     if (preset !== undefined) setActivePreset(preset)
-    setResult(simTournament(next, undefined, undefined, preset === 'chaos'))
+    setResult(simTournament(next, getActiveBracket(year), getActiveTeams(year), preset === 'chaos'))
   }, [])
 
   const handleLoadModel = useCallback((w: StatWeights, loadedResult: TournamentResult, preset: string | null, name: string) => {
@@ -79,15 +81,17 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     toastTimer.current = setTimeout(() => setShareToast(null), 2500)
   }, [])
 
+  const yearParam = year !== DEFAULT_YEAR ? `&y=${year}` : ''
+
   const handleShare = useCallback(() => {
     let url: string
     if (activePreset === 'chaos') {
       const base = typeof window !== 'undefined' ? window.location.origin : ''
       const bracketEncoded = encodeBracket(result)
-      url = `${base}/bracket?b=${bracketEncoded}&p=chaos`
+      url = `${base}/bracket?b=${bracketEncoded}&p=chaos${yearParam}`
     } else {
       const presetParam = activePreset ? `&p=${activePreset}` : ''
-      url = buildShareUrl({ weights, name: modelName || undefined }) + presetParam
+      url = buildShareUrl({ weights, name: modelName || undefined }, undefined, year !== DEFAULT_YEAR ? year : undefined) + presetParam
     }
     navigator.clipboard.writeText(url).catch(() => {
       const el = document.createElement('input')
@@ -99,20 +103,20 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     })
     showToast('Link copied!')
     window.history.replaceState(null, '', url.replace(window.location.origin, ''))
-  }, [weights, modelName, activePreset, result, showToast])
+  }, [weights, modelName, activePreset, result, showToast, year, yearParam])
 
   const handleQR = useCallback(() => {
     const prodBase = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
     let url: string
     if (activePreset === 'chaos') {
-      url = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos`
+      url = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos${yearParam}`
     } else {
       const presetParam = activePreset ? `&p=${activePreset}` : ''
-      url = buildShareUrl({ weights, name: modelName || undefined }, prodBase) + presetParam
+      url = buildShareUrl({ weights, name: modelName || undefined }, prodBase, year !== DEFAULT_YEAR ? year : undefined) + presetParam
     }
     setQrUrl(url)
     setShowQR(true)
-  }, [weights, modelName, activePreset, result])
+  }, [weights, modelName, activePreset, result, year, yearParam])
 
   const handleSignOut = useCallback(async () => {
     await signOut()
@@ -131,10 +135,10 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
       const prodBase = process.env.NEXT_PUBLIC_APP_URL ?? 'https://fanhop.com'
       let shareUrl: string
       if (activePreset === 'chaos') {
-        shareUrl = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos`
+        shareUrl = `${prodBase}/bracket?b=${encodeBracket(result)}&p=chaos${yearParam}`
       } else {
         const presetParam = activePreset ? `&p=${activePreset}` : ''
-        shareUrl = buildShareUrl({ weights, name: modelName || undefined }, prodBase) + presetParam
+        shareUrl = buildShareUrl({ weights, name: modelName || undefined }, prodBase, year !== DEFAULT_YEAR ? year : undefined) + presetParam
       }
       const { exportBracketPdf } = await import('@/lib/exportPdf')
       await exportBracketPdf(result, printName, shareUrl)
@@ -166,7 +170,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
           className="font-barlowc text-[11px] tracking-[2px] uppercase border-l pl-3 sm:pl-5 hidden sm:block"
           style={{ color: 'var(--muted)', borderColor: 'var(--rule)' }}
         >
-          {DEFAULT_YEAR} NCAA Tournament · Model Builder
+          {year} NCAA Tournament · Model Builder
         </div>
 
         <div className="ml-auto flex items-center gap-2 sm:gap-3">
