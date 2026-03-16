@@ -63,9 +63,21 @@ export default function Sidebar({ weights, result, modelName, user, activePreset
   }
 
   async function handleSave() {
-    if (!user) { onNeedAuth(); return }
     const name = modelName.trim()
     if (!name) { onToast('Name your model first'); return }
+
+    if (!user) {
+      // Stash model data so it survives the OAuth redirect
+      const bracketData = activePreset === 'chaos' ? encodeBracket(result) : null
+      try {
+        localStorage.setItem('fanhop:pendingSave', JSON.stringify({
+          name, weights: { ...weights }, champion: result.champion,
+          bracketData, preset: activePreset, ts: Date.now(),
+        }))
+      } catch {}
+      onNeedAuth()
+      return
+    }
 
     setSaving(true)
     try {
