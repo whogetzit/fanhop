@@ -26,7 +26,7 @@ export async function GET(req: NextRequest) {
   }
   // Prune old entries periodically
   if (ogHits.size > 10_000) {
-    for (const [k, v] of ogHits) { if (now > v.resetAt) ogHits.delete(k) }
+    ogHits.forEach((v, k) => { if (now > v.resetAt) ogHits.delete(k) })
   }
 
   const { searchParams } = req.nextUrl
