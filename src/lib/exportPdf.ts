@@ -260,10 +260,10 @@ export async function exportBracketPdf(
   const rightX = PAGE_W - MARGIN - SLOT_W
 
   // ── Draw four regions ──
-  const mw = drawRegion(pdf, result.regions.Midwest, 'Midwest', leftX, topY, 'left')
-  const east = drawRegion(pdf, result.regions.East, 'East', rightX, topY, 'right')
-  const west = drawRegion(pdf, result.regions.West, 'West', leftX, bottomY, 'left')
-  const south = drawRegion(pdf, result.regions.South, 'South', rightX, bottomY, 'right')
+  const east = drawRegion(pdf, result.regions.East, 'East', leftX, topY, 'left')
+  const west = drawRegion(pdf, result.regions.West, 'West', rightX, topY, 'right')
+  const south = drawRegion(pdf, result.regions.South, 'South', leftX, bottomY, 'left')
+  const mw = drawRegion(pdf, result.regions.Midwest, 'Midwest', rightX, bottomY, 'right')
 
   // ── Final Four + Champion ──
   const ffX = PAGE_W / 2 - SLOT_W / 2    // center the FF slots
@@ -296,10 +296,12 @@ export async function exportBracketPdf(
   pdf.text('FF', ffX + 7, ff2Y + 0.5, { align: 'center', baseline: 'middle' })
 
   // Connectors from E8 winners to FF slots
-  drawConnector(pdf, mw.e8EdgeX, mw.e8CenterY, ffX, ff1Y, 'right')
-  drawConnector(pdf, west.e8EdgeX, west.e8CenterY, ffX, ff1Y, 'right')
-  drawConnector(pdf, east.e8EdgeX, east.e8CenterY, ffX + SLOT_W, ff2Y, 'left')
-  drawConnector(pdf, south.e8EdgeX, south.e8CenterY, ffX + SLOT_W, ff2Y, 'left')
+  // ff1: Midwest (bottom-right) vs West (top-right) → connects from right side
+  drawConnector(pdf, west.e8EdgeX, west.e8CenterY, ffX + SLOT_W, ff1Y, 'left')
+  drawConnector(pdf, mw.e8EdgeX, mw.e8CenterY, ffX + SLOT_W, ff1Y, 'left')
+  // ff2: East (top-left) vs South (bottom-left) → connects from left side
+  drawConnector(pdf, east.e8EdgeX, east.e8CenterY, ffX, ff2Y, 'right')
+  drawConnector(pdf, south.e8EdgeX, south.e8CenterY, ffX, ff2Y, 'right')
 
   // ── Champion box ──
   const champBoxW = SLOT_W + 10
