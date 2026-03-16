@@ -140,13 +140,13 @@ export function simTournament(weights: StatWeights, bracket?: BracketData, teams
   }
 
   const ff1 = simMatchup(
-    regions.Midwest.winner, seedMap[regions.Midwest.winner],
-    regions.West.winner,    seedMap[regions.West.winner],
+    regions.East.winner,  seedMap[regions.East.winner],
+    regions.West.winner,  seedMap[regions.West.winner],
     weights, t, chaos
   )
   const ff2 = simMatchup(
-    regions.East.winner,  seedMap[regions.East.winner],
-    regions.South.winner, seedMap[regions.South.winner],
+    regions.South.winner,   seedMap[regions.South.winner],
+    regions.Midwest.winner, seedMap[regions.Midwest.winner],
     weights, t, chaos
   )
 
@@ -160,7 +160,7 @@ export function simTournament(weights: StatWeights, bracket?: BracketData, teams
     regions,
     ff1:       { winner: ff1.winner, loser: ff1.loser },
     ff2:       { winner: ff2.winner, loser: ff2.loser },
-    finalFour: [regions.Midwest.winner, regions.West.winner, regions.East.winner, regions.South.winner],
+    finalFour: [regions.East.winner, regions.West.winner, regions.South.winner, regions.Midwest.winner],
     champion:  championship.winner,
   }
 }
