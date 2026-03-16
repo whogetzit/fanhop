@@ -76,7 +76,9 @@ export function decodeModel(param: string): ModelState | null {
     // Check for name separator
     let name: string | undefined
     if (bytes.length > weightByteCount && bytes[weightByteCount] === 0x00) {
-      name = new TextDecoder().decode(bytes.slice(weightByteCount + 1))
+      const raw = new TextDecoder('utf-8', { fatal: true }).decode(bytes.slice(weightByteCount + 1))
+      // Sanitize: strip control chars, limit length
+      name = raw.replace(/[\x00-\x1f\x7f]/g, '').trim().slice(0, 100) || undefined
     }
 
     return { weights, name }

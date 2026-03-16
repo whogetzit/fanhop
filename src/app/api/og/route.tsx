@@ -6,7 +6,29 @@ import { DEFAULT_WEIGHTS } from '@/types/bracket'
 
 export const runtime = 'edge'
 
+// Simple per-IP rate limiter for edge runtime (50 requests per minute)
+const OG_RATE_LIMIT = 50
+const OG_RATE_WINDOW = 60_000
+const ogHits = new Map<string, { count: number; resetAt: number }>()
+
 export async function GET(req: NextRequest) {
+  // Rate limit by IP
+  const ip = req.headers.get('x-forwarded-for')?.split(',')[0]?.trim() ?? 'unknown'
+  const now = Date.now()
+  const entry = ogHits.get(ip)
+  if (entry && now < entry.resetAt) {
+    entry.count++
+    if (entry.count > OG_RATE_LIMIT) {
+      return new Response('Too Many Requests', { status: 429, headers: { 'Retry-After': '60' } })
+    }
+  } else {
+    ogHits.set(ip, { count: 1, resetAt: now + OG_RATE_WINDOW })
+  }
+  // Prune old entries periodically
+  if (ogHits.size > 10_000) {
+    for (const [k, v] of ogHits) { if (now > v.resetAt) ogHits.delete(k) }
+  }
+
   const { searchParams } = req.nextUrl
   const model = parseModelFromSearchParams(searchParams)
   const weights = model?.weights ?? DEFAULT_WEIGHTS
