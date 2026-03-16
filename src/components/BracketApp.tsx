@@ -6,7 +6,7 @@ import { PRESET_LABELS } from '@/types/bracket'
 import { simTournament, getActiveBracket, getActiveTeams, DEFAULT_YEAR } from '@/lib/simulation'
 import type { TournamentYear } from '@/lib/simulation'
 import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
-import { createClient, signOut } from '@/lib/supabase'
+import { createClient, signOut, saveModelToCloud } from '@/lib/supabase'
 import Sidebar from './Sidebar'
 import BracketCanvas from './BracketCanvas'
 import AuthModal from './AuthModal'
@@ -49,6 +49,34 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
     })
     return () => subscription.unsubscribe()
   }, [])
+
+  // Auto-complete pending save after OAuth redirect
+  useEffect(() => {
+    if (!user) return
+    let raw: string | null = null
+    try { raw = localStorage.getItem('fanhop:pendingSave') } catch { return }
+    if (!raw) return
+    try { localStorage.removeItem('fanhop:pendingSave') } catch {}
+
+    let pending: { name: string; weights: Record<string, number>; champion: string; bracketData: string | null; preset: string | null; ts: number }
+    try { pending = JSON.parse(raw) } catch { return }
+    if (Date.now() - pending.ts > 10 * 60 * 1000) return
+    if (!pending.name || !pending.weights) return
+
+    // Restore UI state
+    const w = pending.weights as unknown as StatWeights
+    setWeights(w)
+    setModelName(pending.name)
+    setActivePreset(pending.preset)
+    const bracket = getActiveBracket(year)
+    const teams = getActiveTeams(year)
+    setResult(simTournament(w, bracket, teams, pending.preset === 'chaos'))
+
+    // Save to cloud
+    saveModelToCloud(pending.name, pending.weights, pending.champion, pending.bracketData, pending.preset)
+      .then(() => showToast(`"${pending.name}" saved`))
+      .catch(() => showToast('Auto-save failed — try saving again'))
+  }, [user]) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Auto-scale bracket to fit mobile viewports
   useEffect(() => {
