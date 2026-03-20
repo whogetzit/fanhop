@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef, useEffect } from 'react'
 import type { StatWeights, TournamentResult } from '@/types/bracket'
 import { PRESET_LABELS } from '@/types/bracket'
-import { simTournament, getActiveBracket, getActiveTeams, DEFAULT_YEAR } from '@/lib/simulation'
+import { simTournament, getActiveBracket, getActiveTeams, getEliminatedTeams, DEFAULT_YEAR } from '@/lib/simulation'
 import type { TournamentYear } from '@/lib/simulation'
 import { buildShareUrl, encodeModel, encodeBracket } from '@/lib/encoding'
 import { createClient, signOut, saveModelToCloud } from '@/lib/supabase'
@@ -36,6 +36,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
   const [showQR, setShowQR] = useState(false)
   const [qrUrl, setQrUrl] = useState<string | null>(null)
   const [pdfLoading, setPdfLoading] = useState(false)
+  const [eliminatedTeams] = useState(() => getEliminatedTeams(year))
   const [bracketScale, setBracketScale] = useState(1)
   const canvasRef = useRef<HTMLDivElement>(null)
   const toastTimer = useRef<ReturnType<typeof setTimeout>>()
@@ -308,7 +309,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             transformOrigin: 'top left',
             width: `${100 / bracketScale}%`,
           } : undefined}>
-            <BracketCanvas result={result} />
+            <BracketCanvas result={result} eliminatedTeams={eliminatedTeams} />
           </div>
         </div>
 

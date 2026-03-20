@@ -5,7 +5,8 @@ import type {
 } from '@/types/bracket'
 import { TEAMS as TEAMS_2013, BRACKET as BRACKET_2013 } from '@/lib/data/2013'
 import { TEAMS as TEAMS_2025, BRACKET as BRACKET_2025 } from '@/lib/data/2025'
-import { TEAMS as TEAMS_2026, BRACKET as BRACKET_2026 } from '@/lib/data/2026'
+import { TEAMS as TEAMS_2026, BRACKET as BRACKET_2026, RESULTS_2026 } from '@/lib/data/2026'
+import { RESULTS_2025 } from '@/lib/data/2025'
 
 export type TournamentYear = '2013' | '2025' | '2026'
 
@@ -23,6 +24,92 @@ export const DEFAULT_YEAR_NUM = parseInt(DEFAULT_YEAR, 10)
 
 export function getActiveTeams(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].teams }
 export function getActiveBracket(year: TournamentYear = DEFAULT_YEAR) { return YEAR_DATA[year].bracket }
+
+// ─── Eliminated teams (for strikethrough display) ─────────────────────────────
+
+const RESULTS_DATA: Record<string, any> = {
+  '2025': RESULTS_2025,
+  '2026': RESULTS_2026,
+}
+
+/** Returns a Set of team names eliminated from the tournament based on actual results */
+export function getEliminatedTeams(year: TournamentYear = DEFAULT_YEAR): Set<string> {
+  const results = RESULTS_DATA[year]
+  if (!results) return new Set()
+
+  const bracket = YEAR_DATA[year].bracket
+  const eliminated = new Set<string>()
+  const regions: string[] = ['South', 'East', 'Midwest', 'West']
+  const R64_SEEDS: [number, number][] = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]]
+
+  for (const region of regions) {
+    const seeds = bracket[region as keyof typeof bracket]
+    const res = results[region]
+    if (!res) continue
+
+    // R64: each winner means the other team in that matchup is eliminated
+    if (res.r64?.length) {
+      R64_SEEDS.forEach(([s1, s2], i) => {
+        if (i < res.r64.length && res.r64[i]) {
+          const winner = res.r64[i]
+          const loser = winner === seeds[s1] ? seeds[s2] : seeds[s1]
+          eliminated.add(loser)
+        }
+      })
+    }
+
+    // R32: winners from R64 who didn't make R32 winners are eliminated
+    if (res.r32?.length && res.r64?.length >= 8) {
+      const r64Winners = new Set(res.r64)
+      const r32Winners = new Set(res.r32.filter(Boolean))
+      for (const team of r64Winners) {
+        if (team && !r32Winners.has(team) && res.r32.length >= Math.ceil(r64Winners.size / 2)) {
+          // Only mark eliminated if enough R32 games are played to determine
+        }
+      }
+      // Simpler: R32 losers are R64 winners not in R32 winners
+      if (res.r32.length >= 4) {
+        for (const team of r64Winners) {
+          if (team && !r32Winners.has(team)) eliminated.add(team)
+        }
+      }
+    }
+
+    // S16: R32 winners not in S16 winners are eliminated
+    if (res.s16?.length >= 2 && res.r32?.length >= 4) {
+      const s16Winners = new Set(res.s16.filter(Boolean))
+      for (const team of res.r32) {
+        if (team && !s16Winners.has(team)) eliminated.add(team)
+      }
+    }
+
+    // E8: S16 winners not matching E8 winner are eliminated
+    if (res.e8 && res.s16?.length >= 2) {
+      for (const team of res.s16) {
+        if (team && team !== res.e8) eliminated.add(team)
+      }
+    }
+  }
+
+  // Final Four: E8 winners who didn't win their semifinal
+  if (results.finalist1 || results.finalist2) {
+    for (const region of regions) {
+      const e8 = results[region]?.e8
+      if (!e8) continue
+      if (results.finalist1 && results.finalist2 && e8 !== results.finalist1 && e8 !== results.finalist2) {
+        eliminated.add(e8)
+      }
+    }
+  }
+
+  // Championship: finalist who didn't win
+  if (results.champion) {
+    if (results.finalist1 && results.finalist1 !== results.champion) eliminated.add(results.finalist1)
+    if (results.finalist2 && results.finalist2 !== results.champion) eliminated.add(results.finalist2)
+  }
+
+  return eliminated
+}
 
 // ─── Score a single team given current weights ────────────────────────────────
 

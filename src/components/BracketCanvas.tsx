@@ -3,14 +3,14 @@
 import type { TournamentResult, RegionResult, Matchup, RegionName } from '@/types/bracket'
 import { getSeed } from '@/lib/simulation'
 
-interface Props { result: TournamentResult }
+interface Props { result: TournamentResult; eliminatedTeams?: Set<string> }
 
 // Pixel constants for alignment
 const SLOT_H = 23
 const GAP = 4
 const MU_GAP = 4
 
-export default function BracketCanvas({ result }: Props) {
+export default function BracketCanvas({ result, eliminatedTeams }: Props) {
   const { regions, ff1, ff2, champion, finalFour } = result
 
   return (
@@ -35,10 +35,10 @@ export default function BracketCanvas({ result }: Props) {
       <Rh cls="west" col={9}>WEST</Rh>
 
       {/* ── Top half: East (left) + West (right) ── */}
-      <RegionLeft  result={regions.East} regionName="East" col={1} row={2} />
-      <RegionLeft  result={regions.East} regionName="East" col={2} row={2} round="r32" />
-      <RegionLeft  result={regions.East} regionName="East" col={3} row={2} round="s16" />
-      <RegionLeft  result={regions.East} regionName="East" col={4} row={2} round="e8" />
+      <RegionLeft  result={regions.East} regionName="East" col={1} row={2} eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.East} regionName="East" col={2} row={2} round="r32" eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.East} regionName="East" col={3} row={2} round="s16" eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.East} regionName="East" col={4} row={2} round="e8" eliminatedTeams={eliminatedTeams} />
 
       {/* Center: Final Four + Champion */}
       <div
@@ -48,20 +48,20 @@ export default function BracketCanvas({ result }: Props) {
         <div className="font-barlowc text-[9px] uppercase tracking-[2px] mb-1" style={{ color: 'var(--muted)' }}>
           Final Four
         </div>
-        <TeamSlot name={ff2.winner} seed={getSeed(ff2.winner)} win cls="final-four" />
+        <TeamSlot name={ff2.winner} seed={getSeed(ff2.winner)} win cls="final-four" eliminated={eliminatedTeams?.has(ff2.winner)} />
         <div className="font-barlowc text-[9px] tracking-[1px]" style={{ color: 'var(--dim)' }}>vs</div>
-        <TeamSlot name={ff1.winner} seed={getSeed(ff1.winner)} win cls="final-four" />
+        <TeamSlot name={ff1.winner} seed={getSeed(ff1.winner)} win cls="final-four" eliminated={eliminatedTeams?.has(ff1.winner)} />
         <div className="font-barlowc text-[9px] uppercase tracking-[2px] mt-2 mb-1" style={{ color: 'var(--muted)' }}>
           Champion
         </div>
-        <TeamSlot name={champion} seed={getSeed(champion)} win cls="champion" />
+        <TeamSlot name={champion} seed={getSeed(champion)} win cls="champion" eliminated={eliminatedTeams?.has(champion)} />
         <div className="text-xl mt-1" style={{ filter: 'drop-shadow(0 0 8px rgba(249,106,27,.9))' }}>🏆</div>
       </div>
 
-      <RegionRight result={regions.West}  regionName="West"  col={6} row={2} round="e8" />
-      <RegionRight result={regions.West}  regionName="West"  col={7} row={2} round="s16" />
-      <RegionRight result={regions.West}  regionName="West"  col={8} row={2} round="r32" />
-      <RegionRight result={regions.West}  regionName="West"  col={9} row={2} />
+      <RegionRight result={regions.West}  regionName="West"  col={6} row={2} round="e8" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.West}  regionName="West"  col={7} row={2} round="s16" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.West}  regionName="West"  col={8} row={2} round="r32" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.West}  regionName="West"  col={9} row={2} eliminatedTeams={eliminatedTeams} />
 
       {/* ── Mid dividers ── */}
       <MidLabel col={1} label="SOUTH" cls="south" />
@@ -69,15 +69,15 @@ export default function BracketCanvas({ result }: Props) {
       <MidLabel col={9} label="MIDWEST" cls="midwest" right />
 
       {/* ── Bottom half: South (left) + Midwest (right) ── */}
-      <RegionLeft  result={regions.South}   regionName="South"   col={1} row={4} />
-      <RegionLeft  result={regions.South}   regionName="South"   col={2} row={4} round="r32" />
-      <RegionLeft  result={regions.South}   regionName="South"   col={3} row={4} round="s16" />
-      <RegionLeft  result={regions.South}   regionName="South"   col={4} row={4} round="e8" />
+      <RegionLeft  result={regions.South}   regionName="South"   col={1} row={4} eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.South}   regionName="South"   col={2} row={4} round="r32" eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.South}   regionName="South"   col={3} row={4} round="s16" eliminatedTeams={eliminatedTeams} />
+      <RegionLeft  result={regions.South}   regionName="South"   col={4} row={4} round="e8" eliminatedTeams={eliminatedTeams} />
 
-      <RegionRight result={regions.Midwest} regionName="Midwest" col={6} row={4} round="e8" />
-      <RegionRight result={regions.Midwest} regionName="Midwest" col={7} row={4} round="s16" />
-      <RegionRight result={regions.Midwest} regionName="Midwest" col={8} row={4} round="r32" />
-      <RegionRight result={regions.Midwest} regionName="Midwest" col={9} row={4} />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={6} row={4} round="e8" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={7} row={4} round="s16" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={8} row={4} round="r32" eliminatedTeams={eliminatedTeams} />
+      <RegionRight result={regions.Midwest} regionName="Midwest" col={9} row={4} eliminatedTeams={eliminatedTeams} />
     </div>
   )
 }
@@ -125,6 +125,7 @@ interface RegionColProps {
   col: number
   row: number
   round?: 'r32' | 's16' | 'e8'
+  eliminatedTeams?: Set<string>
 }
 
 function winnerSeed(m: Matchup): number {
@@ -133,7 +134,7 @@ function winnerSeed(m: Matchup): number {
 
 const R64_PAIRS: [number, number][] = [[1,16],[8,9],[5,12],[4,13],[6,11],[3,14],[7,10],[2,15]]
 
-function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
+function RegionLeft({ result, regionName, col, row, round, eliminatedTeams }: RegionColProps) {
   if (!round) {
     // R64
     return (
@@ -143,8 +144,8 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
           return (
             <div key={i}>
               <div className="flex flex-col gap-px mb-1">
-                <TeamSlot name={m.team1} seed={s1} win={m.winner === m.team1} />
-                <TeamSlot name={m.team2} seed={s2} win={m.winner === m.team2} />
+                <TeamSlot name={m.team1} seed={s1} win={m.winner === m.team1} eliminated={eliminatedTeams?.has(m.team1)} />
+                <TeamSlot name={m.team2} seed={s2} win={m.winner === m.team2} eliminated={eliminatedTeams?.has(m.team2)} />
               </div>
               <div style={{ height: MU_GAP }} />
             </div>
@@ -166,7 +167,7 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset32 }} />
         {result.r32.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win eliminated={eliminatedTeams?.has(m.winner)} />
             <div style={{ height: stride32 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -180,7 +181,7 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset16 }} />
         {result.s16.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win eliminated={eliminatedTeams?.has(m.winner)} />
             <div style={{ height: stride16 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -192,12 +193,12 @@ function RegionLeft({ result, regionName, col, row, round }: RegionColProps) {
   return (
     <div className="flex flex-col" style={{ gridColumn: col, gridRow: row }}>
       <div style={{ height: offsetE8 }} />
-      <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win />
+      <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win eliminated={eliminatedTeams?.has(result.e8.winner)} />
     </div>
   )
 }
 
-function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
+function RegionRight({ result, regionName, col, row, round, eliminatedTeams }: RegionColProps) {
   const stride32 = (SLOT_H * 2 + GAP + MU_GAP) * 2
   const stride16 = stride32 * 2
   const offset32 = SLOT_H + GAP / 2
@@ -213,8 +214,8 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
           return (
             <div key={i}>
               <div className="flex flex-col gap-px mb-1">
-                <TeamSlot name={m.team1} seed={s1} win={m.winner === m.team1} />
-                <TeamSlot name={m.team2} seed={s2} win={m.winner === m.team2} />
+                <TeamSlot name={m.team1} seed={s1} win={m.winner === m.team1} eliminated={eliminatedTeams?.has(m.team1)} />
+                <TeamSlot name={m.team2} seed={s2} win={m.winner === m.team2} eliminated={eliminatedTeams?.has(m.team2)} />
               </div>
               <div style={{ height: MU_GAP }} />
             </div>
@@ -228,7 +229,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
     return (
       <div className="flex flex-col" style={{ gridColumn: col, gridRow: row }}>
         <div style={{ height: offsetE8 }} />
-        <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win />
+        <TeamSlot name={result.e8.winner} seed={winnerSeed(result.e8)} win eliminated={eliminatedTeams?.has(result.e8.winner)} />
       </div>
     )
   }
@@ -239,7 +240,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
         <div style={{ height: offset16 }} />
         {result.s16.map((m, i) => (
           <div key={i}>
-            <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
+            <TeamSlot name={m.winner} seed={winnerSeed(m)} win eliminated={eliminatedTeams?.has(m.winner)} />
             <div style={{ height: stride16 - SLOT_H - MU_GAP }} />
           </div>
         ))}
@@ -253,7 +254,7 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
       <div style={{ height: offset32 }} />
       {result.r32.map((m, i) => (
         <div key={i}>
-          <TeamSlot name={m.winner} seed={winnerSeed(m)} win />
+          <TeamSlot name={m.winner} seed={winnerSeed(m)} win eliminated={eliminatedTeams?.has(m.winner)} />
           <div style={{ height: stride32 - SLOT_H - MU_GAP }} />
         </div>
       ))}
@@ -263,9 +264,9 @@ function RegionRight({ result, regionName, col, row, round }: RegionColProps) {
 
 // ─── Individual team slot ─────────────────────────────────────────────────────
 
-interface SlotProps { name: string; seed: number; win?: boolean; cls?: string }
+interface SlotProps { name: string; seed: number; win?: boolean; cls?: string; eliminated?: boolean }
 
-function TeamSlot({ name, seed, win = false, cls }: SlotProps) {
+function TeamSlot({ name, seed, win = false, cls, eliminated }: SlotProps) {
   const isChamp     = cls === 'champion'
   const isFinalFour = cls === 'final-four'
 
@@ -276,21 +277,23 @@ function TeamSlot({ name, seed, win = false, cls }: SlotProps) {
         minHeight: isChamp ? 32 : isFinalFour ? 28 : SLOT_H,
         border: win ? '1px solid var(--orange2)' : '1px solid transparent',
         background: isChamp
-          ? 'linear-gradient(135deg, var(--orange), #d45510)'
+          ? (eliminated ? 'var(--navy3)' : 'linear-gradient(135deg, var(--orange), #d45510)')
           : isFinalFour
-          ? 'linear-gradient(135deg, #1a3a5c, #0b2a4a)'
+          ? (eliminated ? 'var(--navy3)' : 'linear-gradient(135deg, #1a3a5c, #0b2a4a)')
           : win
-          ? 'var(--orange)'
+          ? (eliminated ? 'var(--navy3)' : 'var(--orange)')
           : 'var(--navy3)',
-        color: win ? 'white' : 'var(--ftext)',
-        fontWeight: win ? 600 : 400,
+        color: eliminated ? 'var(--dim)' : win ? 'white' : 'var(--ftext)',
+        fontWeight: eliminated ? 400 : win ? 600 : 400,
         fontSize: isChamp ? 12 : isFinalFour ? 11 : 10,
-        boxShadow: isChamp
+        opacity: eliminated ? 0.5 : 1,
+        boxShadow: eliminated ? undefined
+          : isChamp
           ? '0 0 16px rgba(249,106,27,.5)'
           : win
           ? '0 0 8px rgba(249,106,27,.3)'
           : undefined,
-        animation: isChamp ? 'glow-pulse 2s infinite' : undefined,
+        animation: (isChamp && !eliminated) ? 'glow-pulse 2s infinite' : undefined,
       }}
     >
       <span
@@ -303,7 +306,7 @@ function TeamSlot({ name, seed, win = false, cls }: SlotProps) {
       >
         {seed}
       </span>
-      <span className="truncate flex-1">{name}</span>
+      <span className="truncate flex-1" style={eliminated ? { textDecoration: 'line-through' } : undefined}>{name}</span>
     </div>
   )
 }

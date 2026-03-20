@@ -163,3 +163,36 @@ export const BRACKET: BracketData = {
     15:  "Tennessee St.",
   },
 }
+
+// ─── 2026 tournament results (for eliminated team strikethrough) ──────────
+// Fill in round-by-round as games are played
+export const RESULTS_2026 = {
+  South: {
+    r64:  [] as string[],
+    r32:  [] as string[],
+    s16:  [] as string[],
+    e8:   "",
+  },
+  East: {
+    r64:  [] as string[],
+    r32:  [] as string[],
+    s16:  [] as string[],
+    e8:   "",
+  },
+  Midwest: {
+    r64:  [] as string[],
+    r32:  [] as string[],
+    s16:  [] as string[],
+    e8:   "",
+  },
+  West: {
+    r64:  [] as string[],
+    r32:  [] as string[],
+    s16:  [] as string[],
+    e8:   "",
+  },
+  finalFour: [] as string[],
+  finalist1: "",
+  finalist2: "",
+  champion:  "",
+}
