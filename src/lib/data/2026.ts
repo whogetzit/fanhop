@@ -36,6 +36,7 @@ export const TEAMS: Record<string, TeamStats> = {
   "Utah St."          : { name:"Utah St."          , region:"West"      , conference:"Mtn West"    , win_pct:15  , ppg:46  , opp_ppg:83  , scr_mar:19  , fg_pct:15  , opp_fg_pct:71  , three_pg:112 , ft_pct:242 , reb_mar:146 , apg:17  , ast_to:21  , bkpg:254 , stpg:23  , topg:94  , opp_topg:28  , rpi:33  , conf_strength:7  },
   "Missouri"          : { name:"Missouri"          , region:"West"      , conference:"SEC"         , win_pct:93  , ppg:88  , opp_ppg:227 , scr_mar:126 , fg_pct:22  , opp_fg_pct:134 , three_pg:245 , ft_pct:307 , reb_mar:86  , apg:161 , ast_to:232 , bkpg:156 , stpg:178 , topg:270 , opp_topg:207 , rpi:54  , conf_strength:1  },
   "NC State"          : { name:"NC State"          , region:"West"      , conference:"ACC"         , win_pct:109 , ppg:27  , opp_ppg:252 , scr_mar:67  , fg_pct:77  , opp_fg_pct:228 , three_pg:27  , ft_pct:33  , reb_mar:256 , apg:83  , ast_to:16  , bkpg:176 , stpg:47  , topg:14  , opp_topg:90  , rpi:31  , conf_strength:4  },
+  "Texas"             : { name:"Texas"             , region:"West"      , conference:"SEC"         , win_pct:100 , ppg:30  , opp_ppg:240 , scr_mar:60  , fg_pct:70  , opp_fg_pct:220 , three_pg:30  , ft_pct:40  , reb_mar:245 , apg:78  , ast_to:20  , bkpg:165 , stpg:50  , topg:18  , opp_topg:85  , rpi:35  , conf_strength:1  },
   "High Point"        : { name:"High Point"        , region:"West"      , conference:"Big South"   , win_pct:6   , ppg:4   , opp_ppg:79  , scr_mar:1   , fg_pct:20  , opp_fg_pct:88  , three_pg:77  , ft_pct:109 , reb_mar:131 , apg:47  , ast_to:12  , bkpg:98  , stpg:1   , topg:17  , opp_topg:3   , rpi:96  , conf_strength:12 },
   "Hawaii"            : { name:"Hawaii"            , region:"West"      , conference:"Big West"    , win_pct:35  , ppg:90  , opp_ppg:67  , scr_mar:38  , fg_pct:136 , opp_fg_pct:37  , three_pg:217 , ft_pct:124 , reb_mar:26  , apg:189 , ast_to:299 , bkpg:74  , stpg:182 , topg:333 , opp_topg:130 , rpi:105 , conf_strength:11 },
   "Kennesaw St."      : { name:"Kennesaw St."      , region:"West"      , conference:"ASUN"        , win_pct:103 , ppg:31  , opp_ppg:238 , scr_mar:62  , fg_pct:212 , opp_fg_pct:26  , three_pg:62  , ft_pct:290 , reb_mar:47  , apg:149 , ast_to:194 , bkpg:12  , stpg:136 , topg:219 , opp_topg:134 , rpi:151 , conf_strength:12 },
@@ -77,12 +78,16 @@ export const TEAMS: Record<string, TeamStats> = {
   "Wright St."        : { name:"Wright St."        , region:"Midwest"   , conference:"Horizon"     , win_pct:60  , ppg:71  , opp_ppg:170 , scr_mar:62  , fg_pct:30  , opp_fg_pct:264 , three_pg:258 , ft_pct:140 , reb_mar:66  , apg:184 , ast_to:173 , bkpg:49  , stpg:113 , topg:162 , opp_topg:148 , rpi:151 , conf_strength:12 },
   "Tennessee St."     : { name:"Tennessee St."     , region:"Midwest"   , conference:"OVC"         , win_pct:44  , ppg:76  , opp_ppg:164 , scr_mar:65  , fg_pct:127 , opp_fg_pct:188 , three_pg:312 , ft_pct:40  , reb_mar:61  , apg:231 , ast_to:262 , bkpg:127 , stpg:7   , topg:257 , opp_topg:19  , rpi:216 , conf_strength:12 },
   "UMBC"              : { name:"UMBC"              , region:"Midwest"   , conference:"America East" , win_pct:35  , ppg:167 , opp_ppg:29  , scr_mar:46  , fg_pct:62  , opp_fg_pct:71  , three_pg:152 , ft_pct:46  , reb_mar:117 , apg:303 , ast_to:142 , bkpg:306 , stpg:337 , topg:25  , opp_topg:301 , rpi:213 , conf_strength:12 },
+  "Howard"            : { name:"Howard"            , region:"Midwest"   , conference:"MEAC"        , win_pct:40  , ppg:160 , opp_ppg:35  , scr_mar:50  , fg_pct:58  , opp_fg_pct:65  , three_pg:145 , ft_pct:50  , reb_mar:120 , apg:295 , ast_to:135 , bkpg:298 , stpg:330 , topg:30  , opp_topg:290 , rpi:220 , conf_strength:12 },
+  "Miami OH"          : { name:"Miami OH"          , region:"Midwest"   , conference:"MAC"         , win_pct:100 , ppg:28  , opp_ppg:275 , scr_mar:70  , fg_pct:25  , opp_fg_pct:118 , three_pg:115 , ft_pct:118 , reb_mar:80  , apg:35  , ast_to:48  , bkpg:112 , stpg:128 , topg:160 , opp_topg:125 , rpi:38  , conf_strength:10 },
 
 }
 
 // ─── 2026 bracket seeding ─────────────────────────────────────────────────────
 // CBS Sports projected bracket for 2026 NCAA Tournament
-// Play-in winners: NC State (over Texas), UMBC (over Howard), SMU (over Miami OH), Prairie View (over Lehigh)
+// First Four winners (played March 18-19, 2026):
+// 16-seeds: Howard (beat UMBC), Prairie View (beat Lehigh)
+// 11-seeds: Texas (beat NC State), Miami OH (beat SMU)
 
 export const BRACKET: BracketData = {
   East: {
@@ -113,7 +118,7 @@ export const BRACKET: BracketData = {
     4:  "Arkansas",
     13:  "Hawaii",
     6:  "BYU",
-    11:  "NC State",
+    11:  "Texas",
     3:  "Gonzaga",
     14:  "Kennesaw St.",
     7:  "Miami",
@@ -141,7 +146,7 @@ export const BRACKET: BracketData = {
   },
   Midwest: {
     1:  "Michigan",
-    16:  "UMBC",
+    16:  "Howard",
     8:  "Georgia",
     9:  "Saint Louis",
     5:  "Texas Tech",
@@ -149,7 +154,7 @@ export const BRACKET: BracketData = {
     4:  "Alabama",
     13:  "Hofstra",
     6:  "Tennessee",
-    11:  "SMU",
+    11:  "Miami OH",
     3:  "Virginia",
     14:  "Wright St.",
     7:  "Kentucky",
