@@ -81,6 +81,7 @@ export const TEAMS: Record<string, TeamStats> = {
 
 // ─── 2026 bracket seeding ─────────────────────────────────────────────────────
 // Using actual first-round matchups from Selection Sunday March 15, 2026
+// Updated with First Four results from March 18-19, 2026
 // First Four winners (played March 17-18):
 // 16-seeds: Howard (beat UMBC 86-83), Prairie View A&M (beat Lehigh 67-55)
 // 11-seeds: Texas (beat NC State 68-66), Miami OH (beat SMU 89-79)
