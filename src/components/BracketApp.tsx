@@ -309,7 +309,7 @@ export default function BracketApp({ initialWeights, initialName, initialPreset,
             transformOrigin: 'top left',
             width: `${100 / bracketScale}%`,
           } : undefined}>
-            <BracketCanvas result={result} eliminatedTeams={eliminatedTeams} />
+            <BracketCanvas result={result} />
           </div>
         </div>
 
