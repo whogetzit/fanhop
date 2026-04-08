@@ -283,10 +283,10 @@ function TeamSlot({ name, seed, win = false, cls, eliminated }: SlotProps) {
           : win
           ? (eliminated ? 'var(--navy3)' : 'var(--orange)')
           : 'var(--navy3)',
-        color: eliminated ? 'var(--dim)' : win ? 'white' : 'var(--ftext)',
+        color: eliminated ? 'var(--ftext)' : win ? 'white' : 'var(--ftext)',
         fontWeight: eliminated ? 400 : win ? 600 : 400,
         fontSize: isChamp ? 12 : isFinalFour ? 11 : 10,
-        opacity: eliminated ? 0.5 : 1,
+        opacity: eliminated ? 0.45 : 1,
         boxShadow: eliminated ? undefined
           : isChamp
           ? '0 0 16px rgba(249,106,27,.5)'
