@@ -68,6 +68,7 @@ export const PRESETS: Record<string, StatWeights> = {
   chalk:    { ppg:0, fg_pct:0, three_pg:0, ft_pct:0, scr_mar:0, opp_ppg:0, opp_fg_pct:0, bkpg:0, stpg:0, reb_mar:0, apg:0, ast_to:0, topg:0, opp_topg:0, win_pct:0, rpi:0, conf_strength:0 },
   chaos:         { ppg:4, fg_pct:4, three_pg:7, ft_pct:2, scr_mar:3, opp_ppg:4, opp_fg_pct:3, bkpg:3, stpg:7, reb_mar:4, apg:5, ast_to:4, topg:5, opp_topg:5, win_pct:2, rpi:1, conf_strength:1 },
   hindsight2025: { ppg:0, fg_pct:2, three_pg:9, ft_pct:0, scr_mar:1, opp_ppg:6, opp_fg_pct:3, bkpg:0, stpg:2, reb_mar:0, apg:0, ast_to:2, topg:2, opp_topg:1, win_pct:4, rpi:0, conf_strength:6 },
+  hindsight2026: { ppg:0, fg_pct:0, three_pg:2, ft_pct:2, scr_mar:1, opp_ppg:3, opp_fg_pct:0, bkpg:2, stpg:0, reb_mar:0, apg:4, ast_to:0, topg:0, opp_topg:0, win_pct:7, rpi:10, conf_strength:8 },
 }
 
 export const PRESET_LABELS: Record<string, string> = {
@@ -77,6 +78,7 @@ export const PRESET_LABELS: Record<string, string> = {
   chalk:         "Chalk",
   chaos:         "🎲 Chaos",
   hindsight2025: "2025 Hindsight",
+  hindsight2026: "2026 Hindsight",
 }
 
 

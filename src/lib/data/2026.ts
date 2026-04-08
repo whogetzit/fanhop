@@ -164,35 +164,35 @@ export const BRACKET: BracketData = {
   },
 }
 
-// ─── 2026 tournament results (for eliminated team strikethrough) ──────────
-// Fill in round-by-round as games are played
+// ─── Actual 2026 tournament results (for scoring) ─────────────────────────────
+// Each round: winner per matchup in bracket order
 export const RESULTS_2026 = {
-  South: {
-    r64:  [] as string[],
-    r32:  [] as string[],
-    s16:  [] as string[],
-    e8:   "",
-  },
   East: {
-    r64:  [] as string[],
-    r32:  [] as string[],
-    s16:  [] as string[],
-    e8:   "",
-  },
-  Midwest: {
-    r64:  [] as string[],
-    r32:  [] as string[],
-    s16:  [] as string[],
-    e8:   "",
+    r64:  ["Duke","TCU","St. John's","Kansas","Louisville","Michigan St.","UCLA","UConn"],
+    r32:  ["Duke","St. John's","Michigan St.","UConn"],
+    s16:  ["Duke","UConn"],
+    e8:   "UConn",
   },
   West: {
-    r64:  [] as string[],
-    r32:  [] as string[],
-    s16:  [] as string[],
-    e8:   "",
+    r64:  ["Arizona","Utah St.","High Point","Arkansas","Texas","Gonzaga","Miami","Purdue"],
+    r32:  ["Arizona","Arkansas","Texas","Purdue"],
+    s16:  ["Arizona","Purdue"],
+    e8:   "Arizona",
   },
-  finalFour: [] as string[],
-  finalist1: "",
-  finalist2: "",
-  champion:  "",
+  South: {
+    r64:  ["Florida","Iowa","Vanderbilt","Nebraska","VCU","Illinois","Texas A&M","Houston"],
+    r32:  ["Iowa","Nebraska","Illinois","Houston"],
+    s16:  ["Iowa","Illinois"],
+    e8:   "Illinois",
+  },
+  Midwest: {
+    r64:  ["Michigan","Saint Louis","Texas Tech","Alabama","Tennessee","Virginia","Kentucky","Iowa St."],
+    r32:  ["Michigan","Alabama","Tennessee","Iowa St."],
+    s16:  ["Michigan","Tennessee"],
+    e8:   "Michigan",
+  },
+  finalFour: ["Michigan","Arizona","UConn","Illinois"],
+  finalist1: "Michigan",   // Midwest vs West → Michigan beat Arizona
+  finalist2: "UConn",      // East vs South → UConn beat Illinois
+  champion:  "Michigan",
 }
